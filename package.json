@@ -15,7 +15,9 @@
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
-    "test": "vitest run"
+    "pretest": "npm rebuild better-sqlite3",
+    "test": "vitest run",
+    "posttest": "npm run postinstall"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
