@@ -86,5 +86,9 @@
       "items": "Items",
       "total": "Total"
     }
+  },
+  "settings": {
+    "theme": "Theme",
+    "language": "Language"
   }
 }
