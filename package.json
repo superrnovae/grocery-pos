@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Point-of-sale desktop application for a neighborhood grocery store (Electron course final project)",
   "main": "./out/main/index.js",
+  "author": "Grocery POS Team",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
