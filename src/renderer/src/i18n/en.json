@@ -8,7 +8,11 @@
   "common": {
     "online": "Online",
     "offline": "Offline",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "theme": {
     "light": "Light",
@@ -17,5 +21,42 @@
   "language": {
     "fr": "French",
     "en": "English"
+  },
+  "products": {
+    "searchPlaceholder": "Search a product...",
+    "barcodePlaceholder": "Scan or type a barcode",
+    "lookupButton": "Look up",
+    "addManually": "Add manually",
+    "empty": "No products yet.",
+    "confirmDelete": "Delete \"{name}\" from the catalog?",
+    "table": {
+      "name": "Name",
+      "brand": "Brand",
+      "barcode": "Barcode",
+      "price": "Price",
+      "source": "Source"
+    },
+    "source": {
+      "manual": "Manual",
+      "openfoodfacts": "OpenFoodFacts"
+    },
+    "lookup": {
+      "alreadyExists": "\"{name}\" is already in the catalog.",
+      "foundOnline": "Found on OpenFoodFacts: review and set the price.",
+      "notFoundOnline": "Not found online: manual entry required."
+    },
+    "form": {
+      "titleCreate": "New product",
+      "titleEdit": "Edit product",
+      "name": "Name",
+      "brand": "Brand",
+      "category": "Category",
+      "barcode": "Barcode",
+      "price": "Price ($)",
+      "errors": {
+        "nameRequired": "Name is required.",
+        "priceRequired": "Price must be a positive number."
+      }
+    }
   }
 }

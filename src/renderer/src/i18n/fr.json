@@ -8,7 +8,11 @@
   "common": {
     "online": "En ligne",
     "offline": "Hors ligne",
-    "comingSoon": "Bientôt disponible"
+    "comingSoon": "Bientôt disponible",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer"
   },
   "theme": {
     "light": "Clair",
@@ -17,5 +21,42 @@
   "language": {
     "fr": "Français",
     "en": "Anglais"
+  },
+  "products": {
+    "searchPlaceholder": "Rechercher un produit...",
+    "barcodePlaceholder": "Scanner ou saisir un code-barres",
+    "lookupButton": "Rechercher",
+    "addManually": "Ajouter manuellement",
+    "empty": "Aucun produit pour le moment.",
+    "confirmDelete": "Supprimer \"{name}\" du catalogue ?",
+    "table": {
+      "name": "Nom",
+      "brand": "Marque",
+      "barcode": "Code-barres",
+      "price": "Prix",
+      "source": "Origine"
+    },
+    "source": {
+      "manual": "Manuel",
+      "openfoodfacts": "OpenFoodFacts"
+    },
+    "lookup": {
+      "alreadyExists": "\"{name}\" est déjà dans le catalogue.",
+      "foundOnline": "Produit trouvé sur OpenFoodFacts : vérifiez et indiquez le prix.",
+      "notFoundOnline": "Produit introuvable en ligne : saisie manuelle requise."
+    },
+    "form": {
+      "titleCreate": "Nouveau produit",
+      "titleEdit": "Modifier le produit",
+      "name": "Nom",
+      "brand": "Marque",
+      "category": "Catégorie",
+      "barcode": "Code-barres",
+      "price": "Prix (€)",
+      "errors": {
+        "nameRequired": "Le nom est obligatoire.",
+        "priceRequired": "Le prix doit être un nombre positif."
+      }
+    }
   }
 }
