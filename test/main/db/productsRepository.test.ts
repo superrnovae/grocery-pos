@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type Database from 'better-sqlite3'
 import { createDatabase } from '../../../src/main/db'
-import { createProductsRepository, type ProductsRepository } from '../../../src/main/db/productsRepository'
+import {
+  createProductsRepository,
+  type ProductsRepository
+} from '../../../src/main/db/productsRepository'
 
 describe('productsRepository', () => {
   let db: Database.Database

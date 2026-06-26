@@ -29,7 +29,16 @@ function rowToProduct(row: ProductRow): Product {
   }
 }
 
-export function createProductsRepository(db: Database.Database) {
+export interface ProductsRepository {
+  list(): Product[]
+  findById(id: number): Product | null
+  findByBarcode(barcode: string): Product | null
+  create(input: NewProduct): Product
+  update(id: number, patch: ProductUpdate): Product
+  delete(id: number): void
+}
+
+export function createProductsRepository(db: Database.Database): ProductsRepository {
   const listStmt = db.prepare('SELECT * FROM products ORDER BY name COLLATE NOCASE')
   const findByIdStmt = db.prepare('SELECT * FROM products WHERE id = ?')
   const findByBarcodeStmt = db.prepare('SELECT * FROM products WHERE barcode = ?')
@@ -97,5 +106,3 @@ export function createProductsRepository(db: Database.Database) {
     }
   }
 }
-
-export type ProductsRepository = ReturnType<typeof createProductsRepository>

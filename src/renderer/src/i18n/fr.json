@@ -1,0 +1,21 @@
+{
+  "nav": {
+    "checkout": "Caisse",
+    "products": "Produits",
+    "history": "Historique",
+    "settings": "Paramètres"
+  },
+  "common": {
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "comingSoon": "Bientôt disponible"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre"
+  },
+  "language": {
+    "fr": "Français",
+    "en": "Anglais"
+  }
+}

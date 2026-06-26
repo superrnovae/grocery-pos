@@ -3,7 +3,12 @@ import type { AppSettings } from '@shared/types'
 
 const DEFAULTS: AppSettings = { theme: 'light', locale: 'fr' }
 
-export function createSettingsRepository(db: Database.Database) {
+export interface SettingsRepository {
+  get(): AppSettings
+  update(patch: Partial<AppSettings>): AppSettings
+}
+
+export function createSettingsRepository(db: Database.Database): SettingsRepository {
   const getStmt = db.prepare('SELECT value FROM settings WHERE key = ?')
   const setStmt = db.prepare(`
     INSERT INTO settings (key, value) VALUES (@key, @value)
@@ -29,5 +34,3 @@ export function createSettingsRepository(db: Database.Database) {
     }
   }
 }
-
-export type SettingsRepository = ReturnType<typeof createSettingsRepository>

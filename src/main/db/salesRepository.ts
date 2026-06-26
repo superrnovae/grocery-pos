@@ -31,7 +31,16 @@ function rowToSaleItem(row: SaleItemRow): SaleItem {
   }
 }
 
-export function createSalesRepository(db: Database.Database, productsRepository: ProductsRepository) {
+export interface SalesRepository {
+  create(payload: NewSalePayload): Sale
+  list(filter?: SalesListFilter): Sale[]
+  getById(id: number): Sale | null
+}
+
+export function createSalesRepository(
+  db: Database.Database,
+  productsRepository: ProductsRepository
+): SalesRepository {
   const insertSaleStmt = db.prepare('INSERT INTO sales (total_cents) VALUES (?)')
   const insertItemStmt = db.prepare(`
     INSERT INTO sale_items
@@ -108,5 +117,3 @@ export function createSalesRepository(db: Database.Database, productsRepository:
     }
   }
 }
-
-export type SalesRepository = ReturnType<typeof createSalesRepository>

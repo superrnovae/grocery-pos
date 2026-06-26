@@ -13,7 +13,10 @@ function assertValidPayload(payload: unknown): payload is NewSalePayload {
   return true
 }
 
-export function registerSalesHandlers(repository: SalesRepository, settings: SettingsRepository): void {
+export function registerSalesHandlers(
+  repository: SalesRepository,
+  settings: SettingsRepository
+): void {
   ipcMain.handle(IpcChannel.SalesCreate, (_event, payload: NewSalePayload) => {
     assertValidPayload(payload)
     const sale = repository.create(payload)
@@ -21,7 +24,9 @@ export function registerSalesHandlers(repository: SalesRepository, settings: Set
     return sale
   })
 
-  ipcMain.handle(IpcChannel.SalesList, (_event, filter: SalesListFilter = {}) => repository.list(filter))
+  ipcMain.handle(IpcChannel.SalesList, (_event, filter: SalesListFilter = {}) =>
+    repository.list(filter)
+  )
 
   ipcMain.handle(IpcChannel.SalesGetById, (_event, id: unknown) => {
     if (typeof id !== 'number' || !Number.isInteger(id)) {
