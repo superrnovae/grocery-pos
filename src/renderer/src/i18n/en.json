@@ -58,5 +58,20 @@
         "priceRequired": "Price must be a positive number."
       }
     }
+  },
+  "checkout": {
+    "barcodePlaceholder": "Scan or type a barcode",
+    "addButton": "Add",
+    "searchPlaceholder": "Search a product...",
+    "unknownBarcode": "No product with code {barcode}. Add it from Products.",
+    "emptyCart": "The cart is empty.",
+    "total": "Total",
+    "completeSale": "Complete sale",
+    "table": {
+      "product": "Product",
+      "unitPrice": "Unit price",
+      "quantity": "Quantity",
+      "lineTotal": "Line total"
+    }
   }
 }

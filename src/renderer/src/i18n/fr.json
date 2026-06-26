@@ -58,5 +58,20 @@
         "priceRequired": "Le prix doit être un nombre positif."
       }
     }
+  },
+  "checkout": {
+    "barcodePlaceholder": "Scanner ou saisir un code-barres",
+    "addButton": "Ajouter",
+    "searchPlaceholder": "Rechercher un produit...",
+    "unknownBarcode": "Aucun produit avec le code {barcode}. Ajoutez-le depuis Produits.",
+    "emptyCart": "Le panier est vide.",
+    "total": "Total",
+    "completeSale": "Valider la vente",
+    "table": {
+      "product": "Produit",
+      "unitPrice": "Prix unitaire",
+      "quantity": "Quantité",
+      "lineTotal": "Sous-total"
+    }
   }
 }
