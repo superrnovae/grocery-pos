@@ -1,8 +1,33 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { IpcChannel, type IpcApi } from '../shared/ipc-contract'
 
-// Custom APIs for renderer
-const api = {}
+const api: IpcApi = {
+  products: {
+    list: () => ipcRenderer.invoke(IpcChannel.ProductsList),
+    create: (input) => ipcRenderer.invoke(IpcChannel.ProductsCreate, input),
+    update: (id, patch) => ipcRenderer.invoke(IpcChannel.ProductsUpdate, id, patch),
+    delete: (id) => ipcRenderer.invoke(IpcChannel.ProductsDelete, id),
+    findByBarcode: (barcode) => ipcRenderer.invoke(IpcChannel.ProductsFindByBarcode, barcode)
+  },
+  lookup: {
+    byBarcode: (barcode) => ipcRenderer.invoke(IpcChannel.LookupByBarcode, barcode)
+  },
+  sales: {
+    create: (payload) => ipcRenderer.invoke(IpcChannel.SalesCreate, payload),
+    list: (filter) => ipcRenderer.invoke(IpcChannel.SalesList, filter),
+    getById: (id) => ipcRenderer.invoke(IpcChannel.SalesGetById, id)
+  },
+  settings: {
+    get: () => ipcRenderer.invoke(IpcChannel.SettingsGet),
+    update: (patch) => ipcRenderer.invoke(IpcChannel.SettingsUpdate, patch)
+  },
+  exportApi: {
+    salesCsv: (filter) => ipcRenderer.invoke(IpcChannel.ExportSalesCsv, filter),
+    productsCsv: () => ipcRenderer.invoke(IpcChannel.ExportProductsCsv),
+    receiptPdf: (saleId) => ipcRenderer.invoke(IpcChannel.ExportReceiptPdf, saleId)
+  }
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

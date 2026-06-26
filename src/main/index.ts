@@ -1,7 +1,15 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { createDatabase } from './db'
+import { createProductsRepository } from './db/productsRepository'
+import { createSalesRepository } from './db/salesRepository'
+import { createSettingsRepository } from './db/settingsRepository'
+import { registerProductsHandlers } from './ipc/productsHandlers'
+import { registerSalesHandlers } from './ipc/salesHandlers'
+import { registerSettingsHandlers } from './ipc/settingsHandlers'
+import { registerLookupHandlers } from './ipc/lookupHandlers'
 
 function createWindow(): void {
   // Create the browser window.
@@ -51,8 +59,15 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  const db = createDatabase()
+  const productsRepository = createProductsRepository(db)
+  const salesRepository = createSalesRepository(db, productsRepository)
+  const settingsRepository = createSettingsRepository(db)
+
+  registerProductsHandlers(productsRepository)
+  registerSalesHandlers(salesRepository, settingsRepository)
+  registerSettingsHandlers(settingsRepository)
+  registerLookupHandlers(settingsRepository)
 
   createWindow()
 
