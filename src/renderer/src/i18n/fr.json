@@ -73,5 +73,18 @@
       "quantity": "Quantité",
       "lineTotal": "Sous-total"
     }
+  },
+  "history": {
+    "exportCsv": "Exporter en CSV",
+    "exportPdf": "Exporter en PDF",
+    "viewReceipt": "Voir le reçu",
+    "empty": "Aucune vente pour le moment.",
+    "notFound": "Vente introuvable.",
+    "receiptTitle": "Reçu #{id}",
+    "table": {
+      "date": "Date",
+      "items": "Articles",
+      "total": "Total"
+    }
   }
 }

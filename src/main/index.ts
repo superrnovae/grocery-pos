@@ -10,6 +10,7 @@ import { registerProductsHandlers } from './ipc/productsHandlers'
 import { registerSalesHandlers } from './ipc/salesHandlers'
 import { registerSettingsHandlers } from './ipc/settingsHandlers'
 import { registerLookupHandlers } from './ipc/lookupHandlers'
+import { registerExportHandlers } from './ipc/exportHandlers'
 
 function createWindow(): void {
   // Create the browser window.
@@ -68,6 +69,7 @@ app.whenReady().then(() => {
   registerSalesHandlers(salesRepository, settingsRepository)
   registerSettingsHandlers(settingsRepository)
   registerLookupHandlers(settingsRepository)
+  registerExportHandlers(productsRepository, salesRepository)
 
   createWindow()
 

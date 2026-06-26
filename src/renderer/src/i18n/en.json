@@ -73,5 +73,18 @@
       "quantity": "Quantity",
       "lineTotal": "Line total"
     }
+  },
+  "history": {
+    "exportCsv": "Export CSV",
+    "exportPdf": "Export PDF",
+    "viewReceipt": "View receipt",
+    "empty": "No sales yet.",
+    "notFound": "Sale not found.",
+    "receiptTitle": "Receipt #{id}",
+    "table": {
+      "date": "Date",
+      "items": "Items",
+      "total": "Total"
+    }
   }
 }
