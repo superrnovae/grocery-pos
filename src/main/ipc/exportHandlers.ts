@@ -3,6 +3,7 @@ import { writeFile } from 'fs/promises'
 import { IpcChannel, type SalesListFilter } from '@shared/ipc-contract'
 import type { ProductsRepository } from '../db/productsRepository'
 import type { SalesRepository } from '../db/salesRepository'
+import type { SettingsRepository } from '../db/settingsRepository'
 import { buildProductsCsv, buildSalesCsv, renderReceiptPdf } from '../services/exportService'
 
 async function saveToFile(
@@ -22,7 +23,8 @@ async function saveToFile(
 
 export function registerExportHandlers(
   productsRepository: ProductsRepository,
-  salesRepository: SalesRepository
+  salesRepository: SalesRepository,
+  settingsRepository: SettingsRepository
 ): void {
   ipcMain.handle(IpcChannel.ExportProductsCsv, async () => {
     const csv = buildProductsCsv(productsRepository.list())
@@ -40,7 +42,7 @@ export function registerExportHandlers(
     }
     const sale = salesRepository.getById(saleId)
     if (!sale) throw new Error(`Sale ${saleId} not found`)
-    const pdf = await renderReceiptPdf(sale)
+    const pdf = await renderReceiptPdf(sale, settingsRepository.get().locale)
     return saveToFile(`receipt-${sale.id}.pdf`, [{ name: 'PDF', extensions: ['pdf'] }], pdf)
   })
 }

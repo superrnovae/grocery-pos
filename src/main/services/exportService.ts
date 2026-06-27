@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron'
-import type { Product, Sale } from '@shared/types'
+import type { Locale, Product, Sale } from '@shared/types'
 
 function escapeCsvCell(value: string): string {
   if (/[",\n]/.test(value)) {
@@ -46,7 +46,25 @@ function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-function buildReceiptHtml(sale: Sale): string {
+const RECEIPT_LABELS = {
+  fr: {
+    receipt: (id: number) => `Reçu #${id}`,
+    product: 'Produit',
+    qty: 'Qté',
+    unitPrice: 'Prix unitaire',
+    total: 'Total'
+  },
+  en: {
+    receipt: (id: number) => `Receipt #${id}`,
+    product: 'Product',
+    qty: 'Qty',
+    unitPrice: 'Unit price',
+    total: 'Total'
+  }
+} as const
+
+function buildReceiptHtml(sale: Sale, locale: Locale): string {
+  const labels = RECEIPT_LABELS[locale]
   const rows = sale.items
     .map(
       (item) => `
@@ -74,14 +92,14 @@ function buildReceiptHtml(sale: Sale): string {
   </head>
   <body>
     <h1>Grocery POS</h1>
-    <p class="muted">Receipt #${sale.id} — ${new Date(sale.createdAt).toLocaleString()}</p>
+    <p class="muted">${escapeHtml(labels.receipt(sale.id))} — ${new Date(sale.createdAt).toLocaleString(locale)}</p>
     <table>
       <thead>
-        <tr><th>Product</th><th>Qty</th><th>Unit price</th><th>Total</th></tr>
+        <tr><th>${labels.product}</th><th>${labels.qty}</th><th>${labels.unitPrice}</th><th>${labels.total}</th></tr>
       </thead>
       <tbody>${rows}</tbody>
       <tfoot>
-        <tr><td colspan="3">Total</td><td>${formatAmount(sale.totalCents)}</td></tr>
+        <tr><td colspan="3">${labels.total}</td><td>${formatAmount(sale.totalCents)}</td></tr>
       </tfoot>
     </table>
   </body>
@@ -89,10 +107,10 @@ function buildReceiptHtml(sale: Sale): string {
 }
 
 /** Renders a sale as a standalone receipt and prints it to a PDF buffer via a hidden window. */
-export async function renderReceiptPdf(sale: Sale): Promise<Buffer> {
+export async function renderReceiptPdf(sale: Sale, locale: Locale): Promise<Buffer> {
   const win = new BrowserWindow({ show: false, webPreferences: { sandbox: true } })
   try {
-    const html = buildReceiptHtml(sale)
+    const html = buildReceiptHtml(sale, locale)
     await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`)
     return await win.webContents.printToPDF({})
   } finally {

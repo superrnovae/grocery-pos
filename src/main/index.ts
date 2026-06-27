@@ -69,7 +69,7 @@ app.whenReady().then(() => {
   registerSalesHandlers(salesRepository, settingsRepository)
   registerSettingsHandlers(settingsRepository)
   registerLookupHandlers(settingsRepository)
-  registerExportHandlers(productsRepository, salesRepository)
+  registerExportHandlers(productsRepository, salesRepository, settingsRepository)
 
   createWindow()
 
