@@ -53,6 +53,11 @@ function addProduct(product: Product): void {
   search.value = ''
 }
 
+function addFirstFiltered(): void {
+  if (filtered.value.length === 0) return
+  addProduct(filtered.value[0])
+}
+
 async function addByBarcode(): Promise<void> {
   const barcode = barcodeInput.value.trim()
   if (!barcode) return
@@ -105,7 +110,12 @@ async function completeSale(): Promise<void> {
         <button type="submit">{{ t('checkout.addButton') }}</button>
       </form>
       <div class="search-box">
-        <input v-model="search" type="search" :placeholder="t('checkout.searchPlaceholder')" />
+        <input
+          v-model="search"
+          type="search"
+          :placeholder="t('checkout.searchPlaceholder')"
+          @keydown.enter="addFirstFiltered"
+        />
         <ul v-if="filtered.length" class="search-results">
           <li v-for="product in filtered" :key="product.id" @click="addProduct(product)">
             <span>{{ product.name }}</span>

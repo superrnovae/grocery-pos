@@ -16,6 +16,12 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
+const titleId = 'product-form-modal-title'
+
+function onKeydown(event: KeyboardEvent): void {
+  if (event.key === 'Escape') emit('cancel')
+}
+
 const name = ref(props.initial.name)
 const brand = ref(props.initial.brand ?? '')
 const category = ref(props.initial.category ?? '')
@@ -51,9 +57,9 @@ function submit(): void {
 </script>
 
 <template>
-  <div class="modal-backdrop" @click.self="emit('cancel')">
-    <div class="modal">
-      <h2>{{ title }}</h2>
+  <div class="modal-backdrop" @click.self="emit('cancel')" @keydown="onKeydown">
+    <div class="modal" role="dialog" aria-modal="true" :aria-labelledby="titleId">
+      <h2 :id="titleId">{{ title }}</h2>
 
       <img v-if="initial.imageUrl" :src="initial.imageUrl" class="preview" alt="" />
 
