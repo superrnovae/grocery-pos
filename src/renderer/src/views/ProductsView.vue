@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useProductsStore } from '../stores/products'
+import { formatPrice } from '../utils/format'
 import type { NewProduct, Product } from '@shared/types'
 import ProductFormModal from '../components/ProductFormModal.vue'
 
@@ -12,7 +13,7 @@ interface ModalState {
   editingId?: number
 }
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const products = useProductsStore()
 
 const search = ref('')
@@ -39,10 +40,6 @@ const filtered = computed(() => {
       product.name.toLowerCase().includes(query) || (product.barcode ?? '').includes(query)
   )
 })
-
-function formatPrice(cents: number): string {
-  return (cents / 100).toFixed(2)
-}
 
 function blankProduct(barcode: string | null = null): NewProduct {
   return {
@@ -193,7 +190,7 @@ async function lookupBarcode(): Promise<void> {
           <td>{{ product.name }}</td>
           <td>{{ product.brand ?? '—' }}</td>
           <td>{{ product.barcode ?? '—' }}</td>
-          <td>{{ formatPrice(product.priceCents) }}</td>
+          <td>{{ formatPrice(product.priceCents, locale) }}</td>
           <td>{{ t(`products.source.${product.source}`) }}</td>
           <td class="actions">
             <button type="button" @click="openEdit(product)">{{ t('common.edit') }}</button>

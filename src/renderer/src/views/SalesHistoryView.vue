@@ -3,8 +3,9 @@ import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useSalesStore } from '../stores/sales'
+import { formatPrice } from '../utils/format'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const sales = useSalesStore()
 const exporting = ref(false)
@@ -19,10 +20,6 @@ onMounted(async () => {
     statusMessage.value = t('common.loadError')
   }
 })
-
-function formatPrice(cents: number): string {
-  return (cents / 100).toFixed(2)
-}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString()
@@ -74,7 +71,7 @@ async function exportCsv(): Promise<void> {
         >
           <td>{{ formatDate(sale.createdAt) }}</td>
           <td>{{ sale.items.length }}</td>
-          <td>{{ formatPrice(sale.totalCents) }}</td>
+          <td>{{ formatPrice(sale.totalCents, locale) }}</td>
           <td>
             <button type="button" @click.stop="openReceipt(sale.id)">
               {{ t('history.viewReceipt') }}

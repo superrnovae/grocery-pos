@@ -5,9 +5,10 @@ import { useRouter } from 'vue-router'
 import { useProductsStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
 import { useSalesStore } from '../stores/sales'
+import { formatPrice } from '../utils/format'
 import type { Product } from '@shared/types'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const products = useProductsStore()
 const cart = useCartStore()
@@ -46,10 +47,6 @@ const filtered = computed(() => {
     )
     .slice(0, 8)
 })
-
-function formatPrice(cents: number): string {
-  return (cents / 100).toFixed(2)
-}
 
 function addProduct(product: Product): void {
   cart.addProduct(product)
@@ -112,7 +109,7 @@ async function completeSale(): Promise<void> {
         <ul v-if="filtered.length" class="search-results">
           <li v-for="product in filtered" :key="product.id" @click="addProduct(product)">
             <span>{{ product.name }}</span>
-            <span>{{ formatPrice(product.priceCents) }}</span>
+            <span>{{ formatPrice(product.priceCents, locale) }}</span>
           </li>
         </ul>
       </div>
@@ -133,13 +130,13 @@ async function completeSale(): Promise<void> {
       <tbody>
         <tr v-for="line in cart.lines" :key="line.product.id">
           <td>{{ line.product.name }}</td>
-          <td>{{ formatPrice(line.product.priceCents) }}</td>
+          <td>{{ formatPrice(line.product.priceCents, locale) }}</td>
           <td class="quantity-cell">
             <button type="button" @click="changeQuantity(line.product.id, -1)">-</button>
             {{ line.quantity }}
             <button type="button" @click="changeQuantity(line.product.id, 1)">+</button>
           </td>
-          <td>{{ formatPrice(line.product.priceCents * line.quantity) }}</td>
+          <td>{{ formatPrice(line.product.priceCents * line.quantity, locale) }}</td>
           <td>
             <button type="button" class="danger" @click="cart.removeProduct(line.product.id)">
               {{ t('common.delete') }}
@@ -153,7 +150,9 @@ async function completeSale(): Promise<void> {
     </table>
 
     <footer class="checkout-footer">
-      <span class="total">{{ t('checkout.total') }}: {{ formatPrice(cart.totalCents) }}</span>
+      <span class="total"
+        >{{ t('checkout.total') }}: {{ formatPrice(cart.totalCents, locale) }}</span
+      >
       <button
         type="button"
         class="primary"

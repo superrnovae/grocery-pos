@@ -2,10 +2,11 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSalesStore } from '../stores/sales'
+import { formatPrice } from '../utils/format'
 import type { Sale } from '@shared/types'
 
 const props = defineProps<{ id: string }>()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const sales = useSalesStore()
 
 const sale = ref<Sale | null>(null)
@@ -20,10 +21,6 @@ onMounted(async () => {
     statusMessage.value = t('common.loadError')
   }
 })
-
-function formatPrice(cents: number): string {
-  return (cents / 100).toFixed(2)
-}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString()
@@ -67,14 +64,14 @@ async function exportPdf(): Promise<void> {
         <tr v-for="item in sale.items" :key="item.id">
           <td>{{ item.productNameSnapshot }}</td>
           <td>{{ item.quantity }}</td>
-          <td>{{ formatPrice(item.unitPriceCentsSnapshot) }}</td>
-          <td>{{ formatPrice(item.lineTotalCents) }}</td>
+          <td>{{ formatPrice(item.unitPriceCentsSnapshot, locale) }}</td>
+          <td>{{ formatPrice(item.lineTotalCents, locale) }}</td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <td colspan="3">{{ t('checkout.total') }}</td>
-          <td>{{ formatPrice(sale.totalCents) }}</td>
+          <td>{{ formatPrice(sale.totalCents, locale) }}</td>
         </tr>
       </tfoot>
     </table>

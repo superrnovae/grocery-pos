@@ -56,7 +56,7 @@
       "brand": "Brand",
       "category": "Category",
       "barcode": "Barcode",
-      "price": "Price ($)",
+      "price": "Price (€)",
       "errors": {
         "nameRequired": "Name is required.",
         "priceRequired": "Price must be a positive number.",
