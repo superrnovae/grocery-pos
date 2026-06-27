@@ -26,7 +26,6 @@
     "posttest": "npm run rebuild:electron"
   },
   "dependencies": {
-    "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "better-sqlite3": "^12.11.1",
     "pinia": "^3.0.4",
