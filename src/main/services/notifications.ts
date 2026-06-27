@@ -8,12 +8,12 @@ const MESSAGES = {
   },
   lookupFailed: {
     fr: (barcode: string) => ({
-      title: 'Produit introuvable en ligne',
-      body: `Le code-barres ${barcode} n'est pas dans OpenFoodFacts. Saisie manuelle requise.`
+      title: 'Recherche en ligne impossible',
+      body: `La recherche du code-barres ${barcode} a échoué (hors ligne ou erreur réseau). Saisie manuelle requise.`
     }),
     en: (barcode: string) => ({
-      title: 'Product not found online',
-      body: `Barcode ${barcode} isn't in OpenFoodFacts. Manual entry required.`
+      title: 'Online lookup failed',
+      body: `Looking up barcode ${barcode} failed (offline or network error). Manual entry required.`
     })
   }
 } as const

@@ -16,9 +16,7 @@ export function registerLookupHandlers(settings: SettingsRepository): void {
       }
 
       try {
-        const result = await lookupByBarcode(barcode)
-        if (!result.found) notifyLookupFailed(barcode, settings.get().locale)
-        return result
+        return await lookupByBarcode(barcode)
       } catch (error) {
         // Offline or network failure: never block checkout, fall back to manual entry.
         console.error('OpenFoodFacts lookup failed', error)
