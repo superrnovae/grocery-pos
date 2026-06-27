@@ -58,4 +58,38 @@ describe('openFoodFactsClient', () => {
 
     expect(result).toEqual({ found: false })
   })
+
+  it('aborts the request via the signal passed to fetch', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ status: 0 }) })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await lookupByBarcode('123')
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    )
+  })
+
+  it('propagates an abort error to the caller', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((_url: string, options?: { signal?: AbortSignal }) => {
+        return new Promise((_resolve, reject) => {
+          if (options?.signal?.aborted) {
+            reject(new Error('aborted'))
+            return
+          }
+          options?.signal?.addEventListener('abort', () => reject(new Error('aborted')))
+        })
+      })
+    )
+
+    const pending = lookupByBarcode('123')
+    const controllerSignal = (vi.mocked(fetch).mock.calls[0]?.[1] as { signal?: AbortSignal })
+      ?.signal
+    controllerSignal?.dispatchEvent(new Event('abort'))
+
+    await expect(pending).rejects.toThrow('aborted')
+  })
 })
