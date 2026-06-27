@@ -70,6 +70,42 @@ describe('salesRepository', () => {
     expect(() => sales.create({ items: [] })).toThrow()
   })
 
+  it('lists multiple sales, each hydrated with its own items in order', () => {
+    const bread = products.create({
+      barcode: null,
+      name: 'Bread',
+      brand: null,
+      category: null,
+      priceCents: 200,
+      imageUrl: null,
+      source: 'manual'
+    })
+    const milk = products.create({
+      barcode: null,
+      name: 'Milk',
+      brand: null,
+      category: null,
+      priceCents: 150,
+      imageUrl: null,
+      source: 'manual'
+    })
+
+    const saleA = sales.create({
+      items: [
+        { productId: bread.id, quantity: 1 },
+        { productId: milk.id, quantity: 2 }
+      ]
+    })
+    const saleB = sales.create({ items: [{ productId: milk.id, quantity: 1 }] })
+
+    const list = sales.list()
+    const reloadedA = list.find((sale) => sale.id === saleA.id)
+    const reloadedB = list.find((sale) => sale.id === saleB.id)
+
+    expect(reloadedA?.items.map((item) => item.productNameSnapshot)).toEqual(['Bread', 'Milk'])
+    expect(reloadedB?.items.map((item) => item.productNameSnapshot)).toEqual(['Milk'])
+  })
+
   it('filters sales by date range', () => {
     const bread = products.create({
       barcode: null,

@@ -59,6 +59,29 @@ export function createSalesRepository(
     return { id: row.id, createdAt: row.created_at, totalCents: row.total_cents, items }
   }
 
+  function hydrateAll(rows: SaleRow[]): Sale[] {
+    if (rows.length === 0) return []
+    const ids = rows.map((row) => row.id)
+    const placeholders = ids.map(() => '?').join(',')
+    const itemRows = db
+      .prepare(`SELECT * FROM sale_items WHERE sale_id IN (${placeholders}) ORDER BY id`)
+      .all(...ids) as SaleItemRow[]
+
+    const itemsBySaleId = new Map<number, SaleItem[]>()
+    for (const itemRow of itemRows) {
+      const items = itemsBySaleId.get(itemRow.sale_id) ?? []
+      items.push(rowToSaleItem(itemRow))
+      itemsBySaleId.set(itemRow.sale_id, items)
+    }
+
+    return rows.map((row) => ({
+      id: row.id,
+      createdAt: row.created_at,
+      totalCents: row.total_cents,
+      items: itemsBySaleId.get(row.id) ?? []
+    }))
+  }
+
   const createTx = db.transaction((payload: NewSalePayload): number => {
     if (payload.items.length === 0) throw new Error('Cannot create a sale with no items')
 
@@ -108,7 +131,7 @@ export function createSalesRepository(
               to: filter.toDate ?? '9999-12-31'
             }) as SaleRow[])
           : (listAllStmt.all() as SaleRow[])
-      return rows.map(hydrate)
+      return hydrateAll(rows)
     },
 
     getById(id: number): Sale | null {
