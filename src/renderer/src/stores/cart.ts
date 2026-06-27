@@ -35,6 +35,25 @@ export const useCartStore = defineStore('cart', {
     },
     clear(): void {
       this.lines = []
+    },
+    syncWithCatalog(catalog: Product[]): { removed: Product[]; updated: Product[] } {
+      const catalogById = new Map(catalog.map((product) => [product.id, product]))
+      const removed: Product[] = []
+      const updated: Product[] = []
+      const nextLines: CartLine[] = []
+      for (const line of this.lines) {
+        const current = catalogById.get(line.product.id)
+        if (!current) {
+          removed.push(line.product)
+          continue
+        }
+        if (current.priceCents !== line.product.priceCents || current.name !== line.product.name) {
+          updated.push(current)
+        }
+        nextLines.push({ product: current, quantity: line.quantity })
+      }
+      this.lines = nextLines
+      return { removed, updated }
     }
   }
 })

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import type { NewProduct, Product, ProductUpdate } from '@shared/types'
+import { useCartStore } from './cart'
 
 export const useProductsStore = defineStore('products', {
   state: () => ({
@@ -21,11 +22,13 @@ export const useProductsStore = defineStore('products', {
       const updated = await window.api.products.update(id, patch)
       const index = this.items.findIndex((product) => product.id === id)
       if (index !== -1) this.items[index] = updated
+      useCartStore().syncWithCatalog(this.items)
       return updated
     },
     async remove(id: number): Promise<void> {
       await window.api.products.delete(id)
       this.items = this.items.filter((product) => product.id !== id)
+      useCartStore().syncWithCatalog(this.items)
     }
   }
 })

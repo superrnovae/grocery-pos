@@ -19,12 +19,20 @@ const message = ref('')
 const completing = ref(false)
 
 onMounted(async () => {
-  if (products.loaded) return
-  try {
-    await products.load()
-  } catch (error) {
-    console.error('Failed to load products', error)
-    message.value = t('common.loadError')
+  if (!products.loaded) {
+    try {
+      await products.load()
+    } catch (error) {
+      console.error('Failed to load products', error)
+      message.value = t('common.loadError')
+      return
+    }
+  }
+  const { removed, updated } = cart.syncWithCatalog(products.items)
+  if (removed.length > 0) {
+    message.value = t('checkout.cartItemsRemoved', { count: removed.length })
+  } else if (updated.length > 0) {
+    message.value = t('checkout.cartItemsUpdated', { count: updated.length })
   }
 })
 

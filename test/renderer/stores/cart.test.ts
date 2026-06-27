@@ -54,4 +54,29 @@ describe('cart store', () => {
 
     expect(cart.lines).toHaveLength(0)
   })
+
+  it('syncWithCatalog drops lines whose product no longer exists', () => {
+    const cart = useCartStore()
+    cart.addProduct(makeProduct({ id: 1 }), 2)
+
+    const { removed, updated } = cart.syncWithCatalog([])
+
+    expect(cart.lines).toHaveLength(0)
+    expect(removed).toHaveLength(1)
+    expect(updated).toHaveLength(0)
+  })
+
+  it('syncWithCatalog refreshes a line whose price or name changed', () => {
+    const cart = useCartStore()
+    cart.addProduct(makeProduct({ id: 1, name: 'Bread', priceCents: 200 }), 2)
+    const refreshed = makeProduct({ id: 1, name: 'Bread', priceCents: 250 })
+
+    const { removed, updated } = cart.syncWithCatalog([refreshed])
+
+    expect(removed).toHaveLength(0)
+    expect(updated).toEqual([refreshed])
+    expect(cart.lines[0].product.priceCents).toBe(250)
+    expect(cart.lines[0].quantity).toBe(2)
+    expect(cart.totalCents).toBe(500)
+  })
 })

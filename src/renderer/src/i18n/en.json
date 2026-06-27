@@ -71,6 +71,8 @@
     "unknownBarcode": "No product with code {barcode}. Add it from Products.",
     "lookupError": "Lookup failed. Try again.",
     "completeSaleError": "Could not complete the sale (an item may have changed). Please review the cart and try again.",
+    "cartItemsRemoved": "{count} item(s) were removed from the cart because they no longer exist in the catalog.",
+    "cartItemsUpdated": "{count} item(s) in the cart had their price or name updated to match the catalog.",
     "emptyCart": "The cart is empty.",
     "total": "Total",
     "completeSale": "Complete sale",

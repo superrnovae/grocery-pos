@@ -71,6 +71,8 @@
     "unknownBarcode": "Aucun produit avec le code {barcode}. Ajoutez-le depuis Produits.",
     "lookupError": "La recherche a échoué. Réessayez.",
     "completeSaleError": "Impossible de valider la vente (un article a peut-être changé). Vérifiez le panier et réessayez.",
+    "cartItemsRemoved": "{count} article(s) ont été retirés du panier car ils n'existent plus dans le catalogue.",
+    "cartItemsUpdated": "{count} article(s) du panier ont vu leur prix ou leur nom mis à jour selon le catalogue.",
     "emptyCart": "Le panier est vide.",
     "total": "Total",
     "completeSale": "Valider la vente",
