@@ -8,8 +8,11 @@ function escapeCsvCell(value: string): string {
   return value
 }
 
+/** Prefixed with a UTF-8 BOM so Excel detects the encoding instead of mangling accented characters. */
 function toCsv(headers: string[], rows: string[][]): string {
-  return [headers, ...rows].map((row) => row.map(escapeCsvCell).join(',')).join('\r\n')
+  const body = [headers, ...rows].map((row) => row.map(escapeCsvCell).join(',')).join('\r\n')
+  const BOM = String.fromCharCode(0xfeff)
+  return BOM + body
 }
 
 function formatAmount(cents: number): string {

@@ -24,7 +24,8 @@ describe('exportService', () => {
     ]
 
     const csv = buildSalesCsv(sales)
-    const lines = csv.split('\r\n')
+    expect(csv.charCodeAt(0)).toBe(0xfeff)
+    const lines = csv.slice(1).split('\r\n')
 
     expect(lines[0]).toBe('id,date,items,total')
     expect(lines[1]).toBe('1,2026-01-01T10:00:00.000Z,"Bread, white x3",6.00')
@@ -47,7 +48,8 @@ describe('exportService', () => {
     ]
 
     const csv = buildProductsCsv(products)
-    const lines = csv.split('\r\n')
+    expect(csv.charCodeAt(0)).toBe(0xfeff)
+    const lines = csv.slice(1).split('\r\n')
 
     expect(lines[0]).toBe('id,barcode,name,brand,category,price,source')
     expect(lines[1]).toBe('1,,Apple,,,0.50,manual')
