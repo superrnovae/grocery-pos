@@ -120,6 +120,9 @@ async function lookupBarcode(): Promise<void> {
       }
       lookupMessage.value = t('products.lookup.notFoundOnline')
     }
+  } catch (error) {
+    console.error('Barcode lookup failed', error)
+    lookupMessage.value = t('products.lookup.error')
   } finally {
     lookupBusy.value = false
     barcodeInput.value = ''

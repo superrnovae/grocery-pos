@@ -43,7 +43,8 @@
     "lookup": {
       "alreadyExists": "\"{name}\" is already in the catalog.",
       "foundOnline": "Found on OpenFoodFacts: review and set the price.",
-      "notFoundOnline": "Not found online: manual entry required."
+      "notFoundOnline": "Not found online: manual entry required.",
+      "error": "Lookup failed (check your connection). Try again or enter the product manually."
     },
     "form": {
       "titleCreate": "New product",
@@ -64,6 +65,7 @@
     "addButton": "Add",
     "searchPlaceholder": "Search a product...",
     "unknownBarcode": "No product with code {barcode}. Add it from Products.",
+    "lookupError": "Lookup failed. Try again.",
     "emptyCart": "The cart is empty.",
     "total": "Total",
     "completeSale": "Complete sale",

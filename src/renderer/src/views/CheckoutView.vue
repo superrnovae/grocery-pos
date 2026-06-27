@@ -46,14 +46,20 @@ async function addByBarcode(): Promise<void> {
   const barcode = barcodeInput.value.trim()
   if (!barcode) return
 
-  const product = await window.api.products.findByBarcode(barcode)
-  if (product) {
-    cart.addProduct(product)
-    message.value = ''
-  } else {
-    message.value = t('checkout.unknownBarcode', { barcode })
+  try {
+    const product = await window.api.products.findByBarcode(barcode)
+    if (product) {
+      cart.addProduct(product)
+      message.value = ''
+    } else {
+      message.value = t('checkout.unknownBarcode', { barcode })
+    }
+  } catch (error) {
+    console.error('Barcode add failed', error)
+    message.value = t('checkout.lookupError')
+  } finally {
+    barcodeInput.value = ''
   }
-  barcodeInput.value = ''
 }
 
 function changeQuantity(productId: number, delta: number): void {

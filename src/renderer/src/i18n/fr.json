@@ -43,7 +43,8 @@
     "lookup": {
       "alreadyExists": "\"{name}\" est déjà dans le catalogue.",
       "foundOnline": "Produit trouvé sur OpenFoodFacts : vérifiez et indiquez le prix.",
-      "notFoundOnline": "Produit introuvable en ligne : saisie manuelle requise."
+      "notFoundOnline": "Produit introuvable en ligne : saisie manuelle requise.",
+      "error": "La recherche a échoué (vérifiez votre connexion). Réessayez ou saisissez le produit manuellement."
     },
     "form": {
       "titleCreate": "Nouveau produit",
@@ -64,6 +65,7 @@
     "addButton": "Ajouter",
     "searchPlaceholder": "Rechercher un produit...",
     "unknownBarcode": "Aucun produit avec le code {barcode}. Ajoutez-le depuis Produits.",
+    "lookupError": "La recherche a échoué. Réessayez.",
     "emptyCart": "Le panier est vide.",
     "total": "Total",
     "completeSale": "Valider la vente",
