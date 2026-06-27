@@ -9,6 +9,7 @@
     "online": "En ligne",
     "offline": "Hors ligne",
     "comingSoon": "Bientôt disponible",
+    "loadError": "Échec du chargement des données. Redémarrez l'application ou réessayez.",
     "save": "Enregistrer",
     "cancel": "Annuler",
     "edit": "Modifier",
@@ -29,6 +30,8 @@
     "addManually": "Ajouter manuellement",
     "empty": "Aucun produit pour le moment.",
     "confirmDelete": "Supprimer \"{name}\" du catalogue ?",
+    "saveError": "Impossible d'enregistrer le produit. Réessayez.",
+    "deleteError": "Impossible de supprimer le produit. Réessayez.",
     "table": {
       "name": "Nom",
       "brand": "Marque",
@@ -56,7 +59,8 @@
       "price": "Prix (€)",
       "errors": {
         "nameRequired": "Le nom est obligatoire.",
-        "priceRequired": "Le prix doit être un nombre positif."
+        "priceRequired": "Le prix doit être un nombre positif.",
+        "duplicateBarcode": "Un autre produit utilise déjà ce code-barres."
       }
     }
   },
@@ -66,6 +70,7 @@
     "searchPlaceholder": "Rechercher un produit...",
     "unknownBarcode": "Aucun produit avec le code {barcode}. Ajoutez-le depuis Produits.",
     "lookupError": "La recherche a échoué. Réessayez.",
+    "completeSaleError": "Impossible de valider la vente (un article a peut-être changé). Vérifiez le panier et réessayez.",
     "emptyCart": "Le panier est vide.",
     "total": "Total",
     "completeSale": "Valider la vente",
@@ -80,6 +85,7 @@
     "exportCsv": "Exporter en CSV",
     "exportPdf": "Exporter en PDF",
     "viewReceipt": "Voir le reçu",
+    "exportError": "L'export a échoué. Réessayez.",
     "empty": "Aucune vente pour le moment.",
     "notFound": "Vente introuvable.",
     "receiptTitle": "Reçu #{id}",

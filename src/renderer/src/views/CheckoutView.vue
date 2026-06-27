@@ -18,8 +18,14 @@ const barcodeInput = ref('')
 const message = ref('')
 const completing = ref(false)
 
-onMounted(() => {
-  if (!products.loaded) products.load()
+onMounted(async () => {
+  if (products.loaded) return
+  try {
+    await products.load()
+  } catch (error) {
+    console.error('Failed to load products', error)
+    message.value = t('common.loadError')
+  }
 })
 
 const filtered = computed(() => {
@@ -69,7 +75,7 @@ function changeQuantity(productId: number, delta: number): void {
 }
 
 async function completeSale(): Promise<void> {
-  if (cart.lines.length === 0) return
+  if (cart.lines.length === 0 || completing.value) return
   completing.value = true
   try {
     const sale = await sales.create({
@@ -77,6 +83,9 @@ async function completeSale(): Promise<void> {
     })
     cart.clear()
     router.push({ name: 'receipt', params: { id: String(sale.id) } })
+  } catch (error) {
+    console.error('Complete sale failed', error)
+    message.value = t('checkout.completeSaleError')
   } finally {
     completing.value = false
   }

@@ -18,11 +18,17 @@ const products = useProductsStore()
 const search = ref('')
 const barcodeInput = ref('')
 const lookupBusy = ref(false)
-const lookupMessage = ref('')
+const statusMessage = ref('')
 const modal = ref<ModalState | null>(null)
 
-onMounted(() => {
-  if (!products.loaded) products.load()
+onMounted(async () => {
+  if (products.loaded) return
+  try {
+    await products.load()
+  } catch (error) {
+    console.error('Failed to load products', error)
+    statusMessage.value = t('common.loadError')
+  }
 })
 
 const filtered = computed(() => {
@@ -67,18 +73,39 @@ function openEdit(product: Product): void {
   }
 }
 
+function isDuplicateBarcodeError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    /UNIQUE constraint failed/i.test(error.message) &&
+    /barcode/i.test(error.message)
+  )
+}
+
 async function onSave(input: NewProduct): Promise<void> {
-  if (modal.value?.editingId) {
-    await products.update(modal.value.editingId, input)
-  } else {
-    await products.create(input)
+  try {
+    if (modal.value?.editingId) {
+      await products.update(modal.value.editingId, input)
+    } else {
+      await products.create(input)
+    }
+    modal.value = null
+    statusMessage.value = ''
+  } catch (error) {
+    console.error('Save product failed', error)
+    statusMessage.value = isDuplicateBarcodeError(error)
+      ? t('products.form.errors.duplicateBarcode')
+      : t('products.saveError')
   }
-  modal.value = null
 }
 
 async function onDelete(product: Product): Promise<void> {
   if (!window.confirm(t('products.confirmDelete', { name: product.name }))) return
-  await products.remove(product.id)
+  try {
+    await products.remove(product.id)
+  } catch (error) {
+    console.error('Delete product failed', error)
+    statusMessage.value = t('products.deleteError')
+  }
 }
 
 async function lookupBarcode(): Promise<void> {
@@ -86,12 +113,12 @@ async function lookupBarcode(): Promise<void> {
   if (!barcode) return
 
   lookupBusy.value = true
-  lookupMessage.value = ''
+  statusMessage.value = ''
 
   try {
     const existing = await window.api.products.findByBarcode(barcode)
     if (existing) {
-      lookupMessage.value = t('products.lookup.alreadyExists', { name: existing.name })
+      statusMessage.value = t('products.lookup.alreadyExists', { name: existing.name })
       openEdit(existing)
       return
     }
@@ -111,18 +138,18 @@ async function lookupBarcode(): Promise<void> {
         },
         barcodeEditable: false
       }
-      lookupMessage.value = t('products.lookup.foundOnline')
+      statusMessage.value = t('products.lookup.foundOnline')
     } else {
       modal.value = {
         title: t('products.form.titleCreate'),
         initial: blankProduct(barcode),
         barcodeEditable: false
       }
-      lookupMessage.value = t('products.lookup.notFoundOnline')
+      statusMessage.value = t('products.lookup.notFoundOnline')
     }
   } catch (error) {
     console.error('Barcode lookup failed', error)
-    lookupMessage.value = t('products.lookup.error')
+    statusMessage.value = t('products.lookup.error')
   } finally {
     lookupBusy.value = false
     barcodeInput.value = ''
@@ -148,7 +175,7 @@ async function lookupBarcode(): Promise<void> {
       </button>
     </header>
 
-    <p v-if="lookupMessage" class="lookup-message">{{ lookupMessage }}</p>
+    <p v-if="statusMessage" class="lookup-message">{{ statusMessage }}</p>
 
     <table class="products-table">
       <thead>

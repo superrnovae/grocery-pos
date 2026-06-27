@@ -9,6 +9,7 @@
     "online": "Online",
     "offline": "Offline",
     "comingSoon": "Coming soon",
+    "loadError": "Failed to load data. Please restart the app or try again.",
     "save": "Save",
     "cancel": "Cancel",
     "edit": "Edit",
@@ -29,6 +30,8 @@
     "addManually": "Add manually",
     "empty": "No products yet.",
     "confirmDelete": "Delete \"{name}\" from the catalog?",
+    "saveError": "Could not save the product. Please try again.",
+    "deleteError": "Could not delete the product. Please try again.",
     "table": {
       "name": "Name",
       "brand": "Brand",
@@ -56,7 +59,8 @@
       "price": "Price ($)",
       "errors": {
         "nameRequired": "Name is required.",
-        "priceRequired": "Price must be a positive number."
+        "priceRequired": "Price must be a positive number.",
+        "duplicateBarcode": "Another product already uses this barcode."
       }
     }
   },
@@ -66,6 +70,7 @@
     "searchPlaceholder": "Search a product...",
     "unknownBarcode": "No product with code {barcode}. Add it from Products.",
     "lookupError": "Lookup failed. Try again.",
+    "completeSaleError": "Could not complete the sale (an item may have changed). Please review the cart and try again.",
     "emptyCart": "The cart is empty.",
     "total": "Total",
     "completeSale": "Complete sale",
@@ -80,6 +85,7 @@
     "exportCsv": "Export CSV",
     "exportPdf": "Export PDF",
     "viewReceipt": "View receipt",
+    "exportError": "Export failed. Please try again.",
     "empty": "No sales yet.",
     "notFound": "Sale not found.",
     "receiptTitle": "Receipt #{id}",

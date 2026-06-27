@@ -8,9 +8,16 @@ const { t } = useI18n()
 const router = useRouter()
 const sales = useSalesStore()
 const exporting = ref(false)
+const statusMessage = ref('')
 
-onMounted(() => {
-  if (!sales.loaded) sales.load()
+onMounted(async () => {
+  if (sales.loaded) return
+  try {
+    await sales.load()
+  } catch (error) {
+    console.error('Failed to load sales', error)
+    statusMessage.value = t('common.loadError')
+  }
 })
 
 function formatPrice(cents: number): string {
@@ -29,6 +36,9 @@ async function exportCsv(): Promise<void> {
   exporting.value = true
   try {
     await window.api.exportApi.salesCsv({})
+  } catch (error) {
+    console.error('Export sales CSV failed', error)
+    statusMessage.value = t('history.exportError')
   } finally {
     exporting.value = false
   }
@@ -43,6 +53,8 @@ async function exportCsv(): Promise<void> {
         {{ t('history.exportCsv') }}
       </button>
     </header>
+
+    <p v-if="statusMessage" class="status-message">{{ statusMessage }}</p>
 
     <table class="sales-table">
       <thead>
@@ -83,6 +95,12 @@ async function exportCsv(): Promise<void> {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+}
+
+.status-message {
+  margin-bottom: 12px;
+  color: var(--color-text-soft);
+  font-size: 13px;
 }
 
 .sales-table {

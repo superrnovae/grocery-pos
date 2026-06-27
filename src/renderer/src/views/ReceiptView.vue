@@ -10,9 +10,15 @@ const sales = useSalesStore()
 
 const sale = ref<Sale | null>(null)
 const exporting = ref(false)
+const statusMessage = ref('')
 
 onMounted(async () => {
-  sale.value = await sales.getById(Number(props.id))
+  try {
+    sale.value = await sales.getById(Number(props.id))
+  } catch (error) {
+    console.error('Failed to load receipt', error)
+    statusMessage.value = t('common.loadError')
+  }
 })
 
 function formatPrice(cents: number): string {
@@ -28,6 +34,9 @@ async function exportPdf(): Promise<void> {
   exporting.value = true
   try {
     await window.api.exportApi.receiptPdf(sale.value.id)
+  } catch (error) {
+    console.error('Export receipt PDF failed', error)
+    statusMessage.value = t('history.exportError')
   } finally {
     exporting.value = false
   }
@@ -43,6 +52,7 @@ async function exportPdf(): Promise<void> {
       </button>
     </header>
     <p class="muted">{{ formatDate(sale.createdAt) }}</p>
+    <p v-if="statusMessage" class="status-message">{{ statusMessage }}</p>
 
     <table class="receipt-table">
       <thead>
@@ -69,6 +79,7 @@ async function exportPdf(): Promise<void> {
       </tfoot>
     </table>
   </section>
+  <p v-else-if="statusMessage" class="status-message">{{ statusMessage }}</p>
   <p v-else class="not-found">{{ t('history.notFound') }}</p>
 </template>
 
@@ -81,6 +92,12 @@ async function exportPdf(): Promise<void> {
 }
 
 .muted {
+  color: var(--color-text-soft);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.status-message {
   color: var(--color-text-soft);
   font-size: 13px;
   margin-bottom: 16px;

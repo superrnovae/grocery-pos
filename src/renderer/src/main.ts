@@ -18,6 +18,9 @@ useOnlineStore().init()
 
 useSettingsStore()
   .load()
+  .catch((error: unknown) => {
+    console.error('Failed to load settings, falling back to defaults', error)
+  })
   .finally(() => {
     app.mount('#app')
   })
