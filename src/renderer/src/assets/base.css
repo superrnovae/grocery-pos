@@ -1,25 +1,101 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is([data-theme='dark'] *));
+
 :root {
-  --color-bg: #f5f6f7;
-  --color-bg-soft: #ffffff;
-  --color-bg-mute: #ececee;
-  --color-border: #d8d8db;
-  --color-text: #1b1b1f;
-  --color-text-soft: #5a5a60;
-  --color-primary: #2f7d46;
-  --color-primary-contrast: #ffffff;
-  --color-danger: #c0392b;
+  --radius: 0.5rem;
+  --background: #f5f6f7;
+  --foreground: #1b1b1f;
+  --card: #ffffff;
+  --card-foreground: #1b1b1f;
+  --popover: #ffffff;
+  --popover-foreground: #1b1b1f;
+  --primary: #2f7d46;
+  --primary-foreground: #ffffff;
+  --secondary: #ececee;
+  --secondary-foreground: #1b1b1f;
+  --muted: #ececee;
+  --muted-foreground: #5a5a60;
+  --accent: #ececee;
+  --accent-foreground: #1b1b1f;
+  --destructive: #c0392b;
+  --destructive-foreground: #ffffff;
+  --border: #d8d8db;
+  --input: #d8d8db;
+  --ring: #2f7d46;
 }
 
 [data-theme='dark'] {
-  --color-bg: #1b1b1f;
-  --color-bg-soft: #222226;
-  --color-bg-mute: #2a2a2f;
-  --color-border: #3a3a3f;
-  --color-text: rgba(255, 255, 245, 0.86);
-  --color-text-soft: rgba(235, 235, 245, 0.6);
-  --color-primary: #4caf6f;
-  --color-primary-contrast: #0b0b0c;
-  --color-danger: #e74c3c;
+  --background: #1b1b1f;
+  --foreground: rgba(255, 255, 245, 0.86);
+  --card: #222226;
+  --card-foreground: rgba(255, 255, 245, 0.86);
+  --popover: #222226;
+  --popover-foreground: rgba(255, 255, 245, 0.86);
+  --primary: #4caf6f;
+  --primary-foreground: #0b0b0c;
+  --secondary: #2a2a2f;
+  --secondary-foreground: rgba(255, 255, 245, 0.86);
+  --muted: #2a2a2f;
+  --muted-foreground: rgba(235, 235, 245, 0.6);
+  --accent: #2a2a2f;
+  --accent-foreground: rgba(255, 255, 245, 0.86);
+  --destructive: #e74c3c;
+  --destructive-foreground: #0b0b0c;
+  --border: #3a3a3f;
+  --input: #3a3a3f;
+  --ring: #4caf6f;
+
+  /* TODO(cleanup): remove once every view is migrated off the old --color-* names. */
+  --color-bg: var(--background);
+  --color-bg-soft: var(--card);
+  --color-bg-mute: var(--secondary);
+  --color-border: var(--border);
+  --color-text: var(--foreground);
+  --color-text-soft: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-contrast: var(--primary-foreground);
+  --color-danger: var(--destructive);
+}
+
+/* TODO(cleanup): remove once every view is migrated off the old --color-* names. */
+:root {
+  --color-bg: var(--background);
+  --color-bg-soft: var(--card);
+  --color-bg-mute: var(--secondary);
+  --color-border: var(--border);
+  --color-text: var(--foreground);
+  --color-text-soft: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-contrast: var(--primary-foreground);
+  --color-danger: var(--destructive);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 *,
@@ -36,8 +112,8 @@ ul {
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-bg);
+  color: var(--foreground);
+  background: var(--background);
   line-height: 1.6;
   font-family:
     Inter,
