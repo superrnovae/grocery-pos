@@ -1,10 +1,23 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Pencil, Trash2 } from '@lucide/vue'
 import { useProductsStore } from '../stores/products'
 import { formatPrice } from '../utils/format'
 import type { NewProduct, Product } from '@shared/types'
 import ProductFormModal from '../components/ProductFormModal.vue'
+import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
+import { Badge } from '../components/ui/badge'
+import { Alert, AlertDescription } from '../components/ui/alert'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '../components/ui/table'
 
 interface ModalState {
   title: string
@@ -155,55 +168,81 @@ async function lookupBarcode(): Promise<void> {
 </script>
 
 <template>
-  <section class="products-view">
-    <header class="toolbar">
-      <input v-model="search" type="search" :placeholder="t('products.searchPlaceholder')" />
-      <form class="barcode-form" @submit.prevent="lookupBarcode">
-        <input
+  <section class="flex flex-col gap-4">
+    <header class="flex flex-wrap items-center gap-3">
+      <Input
+        v-model="search"
+        type="search"
+        :placeholder="t('products.searchPlaceholder')"
+        class="max-w-xs"
+      />
+      <form class="flex gap-2" @submit.prevent="lookupBarcode">
+        <Input
           v-model="barcodeInput"
           type="text"
           :placeholder="t('products.barcodePlaceholder')"
           :disabled="lookupBusy"
+          class="w-56"
         />
-        <button type="submit" :disabled="lookupBusy">{{ t('products.lookupButton') }}</button>
+        <Button type="submit" :disabled="lookupBusy">{{ t('products.lookupButton') }}</Button>
       </form>
-      <button type="button" class="primary" @click="openCreateBlank">
+      <Button type="button" variant="outline" class="ml-auto" @click="openCreateBlank">
         {{ t('products.addManually') }}
-      </button>
+      </Button>
     </header>
 
-    <p v-if="statusMessage" class="lookup-message">{{ statusMessage }}</p>
+    <Alert v-if="statusMessage">
+      <AlertDescription>{{ statusMessage }}</AlertDescription>
+    </Alert>
 
-    <table class="products-table">
-      <thead>
-        <tr>
-          <th>{{ t('products.table.name') }}</th>
-          <th>{{ t('products.table.brand') }}</th>
-          <th>{{ t('products.table.barcode') }}</th>
-          <th>{{ t('products.table.price') }}</th>
-          <th>{{ t('products.table.source') }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in filtered" :key="product.id">
-          <td>{{ product.name }}</td>
-          <td>{{ product.brand ?? '—' }}</td>
-          <td>{{ product.barcode ?? '—' }}</td>
-          <td>{{ formatPrice(product.priceCents, locale) }}</td>
-          <td>{{ t(`products.source.${product.source}`) }}</td>
-          <td class="actions">
-            <button type="button" @click="openEdit(product)">{{ t('common.edit') }}</button>
-            <button type="button" class="danger" @click="onDelete(product)">
-              {{ t('common.delete') }}
-            </button>
-          </td>
-        </tr>
-        <tr v-if="filtered.length === 0">
-          <td colspan="6" class="empty">{{ t('products.empty') }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>{{ t('products.table.name') }}</TableHead>
+          <TableHead>{{ t('products.table.brand') }}</TableHead>
+          <TableHead>{{ t('products.table.barcode') }}</TableHead>
+          <TableHead>{{ t('products.table.price') }}</TableHead>
+          <TableHead>{{ t('products.table.source') }}</TableHead>
+          <TableHead />
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow v-for="product in filtered" :key="product.id">
+          <TableCell>{{ product.name }}</TableCell>
+          <TableCell>{{ product.brand ?? '—' }}</TableCell>
+          <TableCell>{{ product.barcode ?? '—' }}</TableCell>
+          <TableCell>{{ formatPrice(product.priceCents, locale) }}</TableCell>
+          <TableCell>
+            <Badge :variant="product.source === 'manual' ? 'secondary' : 'default'">
+              {{ t(`products.source.${product.source}`) }}
+            </Badge>
+          </TableCell>
+          <TableCell>
+            <div class="flex gap-2">
+              <Button type="button" variant="ghost" size="sm" @click="openEdit(product)">
+                <Pencil class="size-4" />
+                {{ t('common.edit') }}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                class="text-destructive hover:text-destructive"
+                @click="onDelete(product)"
+              >
+                <Trash2 class="size-4" />
+                {{ t('common.delete') }}
+              </Button>
+            </div>
+          </TableCell>
+        </TableRow>
+        <TableRow v-if="filtered.length === 0">
+          <TableCell colspan="6" class="text-muted-foreground text-center">
+            {{ t('products.empty') }}
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
 
     <ProductFormModal
       v-if="modal"
@@ -215,45 +254,3 @@ async function lookupBarcode(): Promise<void> {
     />
   </section>
 </template>
-
-<style scoped>
-.toolbar {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.barcode-form {
-  display: flex;
-  gap: 8px;
-}
-
-.lookup-message {
-  margin-bottom: 12px;
-  color: var(--color-text-soft);
-  font-size: 13px;
-}
-
-.products-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.products-table th,
-.products-table td {
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.products-table .actions {
-  display: flex;
-  gap: 8px;
-}
-
-.products-table .empty {
-  text-align: center;
-  color: var(--color-text-soft);
-}
-</style>
