@@ -2,11 +2,23 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { Minus, Plus, Trash2 } from '@lucide/vue'
 import { useProductsStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
 import { useSalesStore } from '../stores/sales'
 import { formatPrice } from '../utils/format'
 import type { Product } from '@shared/types'
+import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
+import { Alert, AlertDescription } from '../components/ui/alert'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '../components/ui/table'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -103,165 +115,117 @@ async function completeSale(): Promise<void> {
 </script>
 
 <template>
-  <section class="checkout-view">
-    <div class="lookup-row">
-      <form class="barcode-form" @submit.prevent="addByBarcode">
-        <input v-model="barcodeInput" type="text" :placeholder="t('checkout.barcodePlaceholder')" />
-        <button type="submit">{{ t('checkout.addButton') }}</button>
+  <section class="flex flex-col gap-4">
+    <div class="flex flex-wrap gap-4">
+      <form class="flex gap-2" @submit.prevent="addByBarcode">
+        <Input
+          v-model="barcodeInput"
+          type="text"
+          :placeholder="t('checkout.barcodePlaceholder')"
+          class="w-56"
+        />
+        <Button type="submit">{{ t('checkout.addButton') }}</Button>
       </form>
-      <div class="search-box">
-        <input
+      <div class="relative min-w-56 flex-1">
+        <Input
           v-model="search"
           type="search"
           :placeholder="t('checkout.searchPlaceholder')"
           @keydown.enter="addFirstFiltered"
         />
-        <ul v-if="filtered.length" class="search-results">
-          <li v-for="product in filtered" :key="product.id" @click="addProduct(product)">
+        <div
+          v-if="filtered.length"
+          class="bg-popover text-popover-foreground absolute top-full right-0 left-0 z-10 mt-1 max-h-60 overflow-y-auto rounded-md border shadow-md"
+        >
+          <button
+            v-for="product in filtered"
+            :key="product.id"
+            type="button"
+            class="hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between px-3 py-2 text-sm"
+            @click="addProduct(product)"
+          >
             <span>{{ product.name }}</span>
             <span>{{ formatPrice(product.priceCents, locale) }}</span>
-          </li>
-        </ul>
+          </button>
+        </div>
       </div>
     </div>
 
-    <p v-if="message" class="checkout-message">{{ message }}</p>
+    <Alert v-if="message">
+      <AlertDescription>{{ message }}</AlertDescription>
+    </Alert>
 
-    <table class="cart-table">
-      <thead>
-        <tr>
-          <th>{{ t('checkout.table.product') }}</th>
-          <th>{{ t('checkout.table.unitPrice') }}</th>
-          <th>{{ t('checkout.table.quantity') }}</th>
-          <th>{{ t('checkout.table.lineTotal') }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="line in cart.lines" :key="line.product.id">
-          <td>{{ line.product.name }}</td>
-          <td>{{ formatPrice(line.product.priceCents, locale) }}</td>
-          <td class="quantity-cell">
-            <button type="button" @click="changeQuantity(line.product.id, -1)">-</button>
-            {{ line.quantity }}
-            <button type="button" @click="changeQuantity(line.product.id, 1)">+</button>
-          </td>
-          <td>{{ formatPrice(line.product.priceCents * line.quantity, locale) }}</td>
-          <td>
-            <button type="button" class="danger" @click="cart.removeProduct(line.product.id)">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>{{ t('checkout.table.product') }}</TableHead>
+          <TableHead>{{ t('checkout.table.unitPrice') }}</TableHead>
+          <TableHead>{{ t('checkout.table.quantity') }}</TableHead>
+          <TableHead>{{ t('checkout.table.lineTotal') }}</TableHead>
+          <TableHead />
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow v-for="line in cart.lines" :key="line.product.id">
+          <TableCell>{{ line.product.name }}</TableCell>
+          <TableCell>{{ formatPrice(line.product.priceCents, locale) }}</TableCell>
+          <TableCell>
+            <div class="flex items-center gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                class="size-7"
+                @click="changeQuantity(line.product.id, -1)"
+              >
+                <Minus class="size-3.5" />
+              </Button>
+              <span class="w-6 text-center">{{ line.quantity }}</span>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                class="size-7"
+                @click="changeQuantity(line.product.id, 1)"
+              >
+                <Plus class="size-3.5" />
+              </Button>
+            </div>
+          </TableCell>
+          <TableCell>{{ formatPrice(line.product.priceCents * line.quantity, locale) }}</TableCell>
+          <TableCell>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              class="text-destructive hover:text-destructive"
+              @click="cart.removeProduct(line.product.id)"
+            >
+              <Trash2 class="size-4" />
               {{ t('common.delete') }}
-            </button>
-          </td>
-        </tr>
-        <tr v-if="cart.lines.length === 0">
-          <td colspan="5" class="empty">{{ t('checkout.emptyCart') }}</td>
-        </tr>
-      </tbody>
-    </table>
+            </Button>
+          </TableCell>
+        </TableRow>
+        <TableRow v-if="cart.lines.length === 0">
+          <TableCell colspan="5" class="text-muted-foreground text-center">
+            {{ t('checkout.emptyCart') }}
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
 
-    <footer class="checkout-footer">
-      <span class="total"
-        >{{ t('checkout.total') }}: {{ formatPrice(cart.totalCents, locale) }}</span
-      >
-      <button
+    <footer class="flex items-center justify-end gap-5">
+      <span class="text-lg font-bold">
+        {{ t('checkout.total') }}: {{ formatPrice(cart.totalCents, locale) }}
+      </span>
+      <Button
         type="button"
-        class="primary"
+        size="lg"
         :disabled="cart.lines.length === 0 || completing"
         @click="completeSale"
       >
         {{ t('checkout.completeSale') }}
-      </button>
+      </Button>
     </footer>
   </section>
 </template>
-
-<style scoped>
-.lookup-row {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.barcode-form {
-  display: flex;
-  gap: 8px;
-}
-
-.search-box {
-  position: relative;
-  flex: 1;
-  min-width: 220px;
-}
-
-.search-box input {
-  width: 100%;
-}
-
-.search-results {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--color-bg-soft);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  margin-top: 4px;
-  z-index: 10;
-  max-height: 240px;
-  overflow-y: auto;
-}
-
-.search-results li {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 10px;
-  cursor: pointer;
-}
-
-.search-results li:hover {
-  background: var(--color-bg-mute);
-}
-
-.checkout-message {
-  margin-bottom: 12px;
-  color: var(--color-text-soft);
-  font-size: 13px;
-}
-
-.cart-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.cart-table th,
-.cart-table td {
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.cart-table .quantity-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.cart-table .empty {
-  text-align: center;
-  color: var(--color-text-soft);
-}
-
-.checkout-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.checkout-footer .total {
-  font-size: 18px;
-  font-weight: 700;
-}
-</style>
