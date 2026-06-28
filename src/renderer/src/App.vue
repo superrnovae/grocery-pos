@@ -3,73 +3,33 @@ import { useI18n } from 'vue-i18n'
 import OnlineIndicator from './components/OnlineIndicator.vue'
 
 const { t } = useI18n()
+
+const links = [
+  { to: '/caisse', label: 'nav.checkout' },
+  { to: '/produits', label: 'nav.products' },
+  { to: '/historique', label: 'nav.history' },
+  { to: '/parametres', label: 'nav.settings' }
+]
 </script>
 
 <template>
-  <div class="app-shell">
-    <header class="app-header">
-      <span class="app-title">Grocery POS</span>
-      <nav class="app-nav">
-        <router-link to="/caisse">{{ t('nav.checkout') }}</router-link>
-        <router-link to="/produits">{{ t('nav.products') }}</router-link>
-        <router-link to="/historique">{{ t('nav.history') }}</router-link>
-        <router-link to="/parametres">{{ t('nav.settings') }}</router-link>
+  <div class="flex min-h-screen flex-col">
+    <header class="bg-card flex items-center gap-6 border-b px-5 py-3">
+      <span class="text-base font-bold">Grocery POS</span>
+      <nav class="flex flex-1 gap-5">
+        <router-link
+          v-for="link in links"
+          :key="link.to"
+          :to="link.to"
+          class="text-muted-foreground hover:text-foreground border-b-2 border-transparent py-1 text-sm font-semibold no-underline [&.router-link-active]:border-primary [&.router-link-active]:text-primary"
+        >
+          {{ t(link.label) }}
+        </router-link>
       </nav>
       <OnlineIndicator />
     </header>
-    <main class="app-main">
+    <main class="flex-1 p-6">
       <router-view />
     </main>
   </div>
 </template>
-
-<style scoped>
-.app-shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.app-header {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg-soft);
-}
-
-.app-title {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.app-nav {
-  display: flex;
-  gap: 16px;
-  flex: 1;
-}
-
-.app-nav a {
-  color: var(--color-text-soft);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 6px 4px;
-  border-bottom: 2px solid transparent;
-}
-
-.app-nav a:hover {
-  color: var(--color-text);
-}
-
-.app-nav a.router-link-active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-.app-main {
-  flex: 1;
-  padding: 24px;
-}
-</style>
