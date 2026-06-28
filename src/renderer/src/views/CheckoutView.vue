@@ -141,7 +141,7 @@ async function completeSale(): Promise<void> {
             v-for="product in filtered"
             :key="product.id"
             type="button"
-            class="hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between px-3 py-2 text-sm"
+            class="hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between rounded-none border-0 bg-transparent px-3 py-2 text-left text-sm"
             @click="addProduct(product)"
           >
             <span>{{ product.name }}</span>

@@ -46,30 +46,6 @@
   --border: #3a3a3f;
   --input: #3a3a3f;
   --ring: #4caf6f;
-
-  /* TODO(cleanup): remove once every view is migrated off the old --color-* names. */
-  --color-bg: var(--background);
-  --color-bg-soft: var(--card);
-  --color-bg-mute: var(--secondary);
-  --color-border: var(--border);
-  --color-text: var(--foreground);
-  --color-text-soft: var(--muted-foreground);
-  --color-primary: var(--primary);
-  --color-primary-contrast: var(--primary-foreground);
-  --color-danger: var(--destructive);
-}
-
-/* TODO(cleanup): remove once every view is migrated off the old --color-* names. */
-:root {
-  --color-bg: var(--background);
-  --color-bg-soft: var(--card);
-  --color-bg-mute: var(--secondary);
-  --color-border: var(--border);
-  --color-text: var(--foreground);
-  --color-text-soft: var(--muted-foreground);
-  --color-primary: var(--primary);
-  --color-primary-contrast: var(--primary-foreground);
-  --color-danger: var(--destructive);
 }
 
 @theme inline {
@@ -104,10 +80,6 @@
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;
-}
-
-ul {
-  list-style: none;
 }
 
 body {
