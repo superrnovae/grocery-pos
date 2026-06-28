@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Printer } from '@lucide/vue'
 import { useSalesStore } from '../stores/sales'
 import { formatPrice } from '../utils/format'
 import type { Sale } from '@shared/types'
@@ -22,6 +23,7 @@ const sales = useSalesStore()
 
 const sale = ref<Sale | null>(null)
 const exporting = ref(false)
+const printing = ref(false)
 const statusMessage = ref('')
 
 onMounted(async () => {
@@ -49,15 +51,34 @@ async function exportPdf(): Promise<void> {
     exporting.value = false
   }
 }
+
+async function printSale(): Promise<void> {
+  if (!sale.value) return
+  printing.value = true
+  try {
+    await window.api.exportApi.printReceipt(sale.value.id)
+  } catch (error) {
+    console.error('Print receipt failed', error)
+    statusMessage.value = t('history.printError')
+  } finally {
+    printing.value = false
+  }
+}
 </script>
 
 <template>
   <section v-if="sale" class="flex flex-col gap-4">
     <header class="flex items-center justify-between">
       <h1 class="text-xl font-bold">{{ t('history.receiptTitle', { id: sale.id }) }}</h1>
-      <Button type="button" variant="outline" :disabled="exporting" @click="exportPdf">
-        {{ t('history.exportPdf') }}
-      </Button>
+      <div class="flex gap-2">
+        <Button type="button" variant="outline" :disabled="printing" @click="printSale">
+          <Printer class="size-4" />
+          {{ t('history.print') }}
+        </Button>
+        <Button type="button" variant="outline" :disabled="exporting" @click="exportPdf">
+          {{ t('history.exportPdf') }}
+        </Button>
+      </div>
     </header>
     <p class="text-muted-foreground -mt-2 text-sm">{{ formatDate(sale.createdAt) }}</p>
 

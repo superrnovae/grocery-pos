@@ -86,8 +86,10 @@
   "history": {
     "exportCsv": "Exporter en CSV",
     "exportPdf": "Exporter en PDF",
+    "print": "Imprimer",
     "viewReceipt": "Voir le reçu",
     "exportError": "L'export a échoué. Réessayez.",
+    "printError": "L'impression a échoué. Réessayez.",
     "from": "Du",
     "to": "Au",
     "today": "Aujourd'hui",

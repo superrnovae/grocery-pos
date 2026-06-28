@@ -4,7 +4,12 @@ import { IpcChannel, type SalesListFilter } from '@shared/ipc-contract'
 import type { ProductsRepository } from '../db/productsRepository'
 import type { SalesRepository } from '../db/salesRepository'
 import type { SettingsRepository } from '../db/settingsRepository'
-import { buildProductsCsv, buildSalesCsv, renderReceiptPdf } from '../services/exportService'
+import {
+  buildProductsCsv,
+  buildSalesCsv,
+  printReceipt,
+  renderReceiptPdf
+} from '../services/exportService'
 
 async function saveToFile(
   defaultPath: string,
@@ -44,5 +49,14 @@ export function registerExportHandlers(
     if (!sale) throw new Error(`Sale ${saleId} not found`)
     const pdf = await renderReceiptPdf(sale, settingsRepository.get().locale)
     return saveToFile(`receipt-${sale.id}.pdf`, [{ name: 'PDF', extensions: ['pdf'] }], pdf)
+  })
+
+  ipcMain.handle(IpcChannel.ExportPrintReceipt, async (_event, saleId: unknown) => {
+    if (typeof saleId !== 'number' || !Number.isInteger(saleId)) {
+      throw new Error('saleId must be an integer')
+    }
+    const sale = salesRepository.getById(saleId)
+    if (!sale) throw new Error(`Sale ${saleId} not found`)
+    await printReceipt(sale, settingsRepository.get().locale)
   })
 }

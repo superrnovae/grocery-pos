@@ -106,14 +106,40 @@ function buildReceiptHtml(sale: Sale, locale: Locale): string {
 </html>`
 }
 
-/** Renders a sale as a standalone receipt and prints it to a PDF buffer via a hidden window. */
-export async function renderReceiptPdf(sale: Sale, locale: Locale): Promise<Buffer> {
+async function withReceiptWindow<T>(
+  sale: Sale,
+  locale: Locale,
+  action: (win: BrowserWindow) => Promise<T>
+): Promise<T> {
   const win = new BrowserWindow({ show: false, webPreferences: { sandbox: true } })
   try {
     const html = buildReceiptHtml(sale, locale)
     await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`)
-    return await win.webContents.printToPDF({})
+    return await action(win)
   } finally {
     win.close()
   }
+}
+
+/** Renders a sale as a standalone receipt and prints it to a PDF buffer via a hidden window. */
+export async function renderReceiptPdf(sale: Sale, locale: Locale): Promise<Buffer> {
+  return withReceiptWindow(sale, locale, (win) => win.webContents.printToPDF({}))
+}
+
+/** Opens the OS print dialog for the receipt, so the cashier can print a physical ticket. */
+export async function printReceipt(sale: Sale, locale: Locale): Promise<void> {
+  await withReceiptWindow(
+    sale,
+    locale,
+    (win) =>
+      new Promise<void>((resolve, reject) => {
+        win.webContents.print({ silent: false }, (success, failureReason) => {
+          if (success || failureReason === 'cancelled') {
+            resolve()
+          } else {
+            reject(new Error(failureReason))
+          }
+        })
+      })
+  )
 }

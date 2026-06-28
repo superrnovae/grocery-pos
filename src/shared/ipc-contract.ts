@@ -22,7 +22,8 @@ export const IpcChannel = {
   SettingsUpdate: 'settings:update',
   ExportSalesCsv: 'export:salesCsv',
   ExportProductsCsv: 'export:productsCsv',
-  ExportReceiptPdf: 'export:receiptPdf'
+  ExportReceiptPdf: 'export:receiptPdf',
+  ExportPrintReceipt: 'export:printReceipt'
 } as const
 
 export type IpcChannelName = (typeof IpcChannel)[keyof typeof IpcChannel]
@@ -57,5 +58,6 @@ export interface IpcApi {
     salesCsv(filter: SalesListFilter): Promise<string | null>
     productsCsv(): Promise<string | null>
     receiptPdf(saleId: number): Promise<string | null>
+    printReceipt(saleId: number): Promise<void>
   }
 }

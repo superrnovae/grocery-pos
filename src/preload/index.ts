@@ -24,7 +24,8 @@ const api: IpcApi = {
   exportApi: {
     salesCsv: (filter) => ipcRenderer.invoke(IpcChannel.ExportSalesCsv, filter),
     productsCsv: () => ipcRenderer.invoke(IpcChannel.ExportProductsCsv),
-    receiptPdf: (saleId) => ipcRenderer.invoke(IpcChannel.ExportReceiptPdf, saleId)
+    receiptPdf: (saleId) => ipcRenderer.invoke(IpcChannel.ExportReceiptPdf, saleId),
+    printReceipt: (saleId) => ipcRenderer.invoke(IpcChannel.ExportPrintReceipt, saleId)
   }
 }
 
