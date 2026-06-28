@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannel, type IpcApi } from '../shared/ipc-contract'
+import type { ImportProgress } from '../shared/types'
 
 const api: IpcApi = {
   products: {
@@ -7,7 +8,14 @@ const api: IpcApi = {
     create: (input) => ipcRenderer.invoke(IpcChannel.ProductsCreate, input),
     update: (id, patch) => ipcRenderer.invoke(IpcChannel.ProductsUpdate, id, patch),
     delete: (id) => ipcRenderer.invoke(IpcChannel.ProductsDelete, id),
-    findByBarcode: (barcode) => ipcRenderer.invoke(IpcChannel.ProductsFindByBarcode, barcode)
+    findByBarcode: (barcode) => ipcRenderer.invoke(IpcChannel.ProductsFindByBarcode, barcode),
+    bulkImport: () => ipcRenderer.invoke(IpcChannel.ProductsBulkImport),
+    onImportProgress: (callback) => {
+      const listener = (_event: Electron.IpcRendererEvent, progress: ImportProgress): void =>
+        callback(progress)
+      ipcRenderer.on(IpcChannel.ProductsImportProgress, listener)
+      return () => ipcRenderer.removeListener(IpcChannel.ProductsImportProgress, listener)
+    }
   },
   lookup: {
     byBarcode: (barcode) => ipcRenderer.invoke(IpcChannel.LookupByBarcode, barcode)

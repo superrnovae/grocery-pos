@@ -28,10 +28,21 @@
     "barcodePlaceholder": "Scanner ou saisir un code-barres",
     "lookupButton": "Rechercher",
     "addManually": "Ajouter manuellement",
+    "importCatalog": "Importer le catalogue",
     "empty": "Aucun produit pour le moment.",
     "confirmDelete": "Supprimer \"{name}\" du catalogue ?",
     "saveError": "Impossible d'enregistrer le produit. Réessayez.",
     "deleteError": "Impossible de supprimer le produit. Réessayez.",
+    "import": {
+      "title": "Importer le catalogue depuis un CSV",
+      "description": "Choisissez un fichier CSV avec des colonnes \"name\" et \"price\" (facultatif : brand, category, barcode). Les produits existants sont reconnus et mis à jour par code-barres.",
+      "choose": "Choisir un fichier...",
+      "progress": "Import en cours {processed} / {total}...",
+      "summary": "{imported} produit(s) importé(s) sur {total}.",
+      "errorsTitle": "{count} ligne(s) n'ont pas pu être importées :",
+      "close": "Fermer",
+      "error": "L'import a échoué. Réessayez."
+    },
     "table": {
       "name": "Nom",
       "brand": "Marque",

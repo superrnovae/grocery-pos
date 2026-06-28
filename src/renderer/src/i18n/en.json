@@ -28,10 +28,21 @@
     "barcodePlaceholder": "Scan or type a barcode",
     "lookupButton": "Look up",
     "addManually": "Add manually",
+    "importCatalog": "Import catalog",
     "empty": "No products yet.",
     "confirmDelete": "Delete \"{name}\" from the catalog?",
     "saveError": "Could not save the product. Please try again.",
     "deleteError": "Could not delete the product. Please try again.",
+    "import": {
+      "title": "Import catalog from CSV",
+      "description": "Choose a CSV file with \"name\" and \"price\" columns (optional: brand, category, barcode). Existing products are matched and updated by barcode.",
+      "choose": "Choose file...",
+      "progress": "Importing {processed} / {total}...",
+      "summary": "Imported {imported} of {total} product(s).",
+      "errorsTitle": "{count} row(s) could not be imported:",
+      "close": "Close",
+      "error": "Import failed. Please try again."
+    },
     "table": {
       "name": "Name",
       "brand": "Brand",

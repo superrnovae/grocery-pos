@@ -36,6 +36,8 @@ export interface ProductsRepository {
   create(input: NewProduct): Product
   update(id: number, patch: ProductUpdate): Product
   delete(id: number): void
+  /** Inserts new products and updates existing ones by barcode (rows without a barcode always insert). */
+  bulkUpsert(inputs: NewProduct[]): number
 }
 
 export function createProductsRepository(db: Database.Database): ProductsRepository {
@@ -54,6 +56,30 @@ export function createProductsRepository(db: Database.Database): ProductsReposit
     WHERE id = @id
   `)
   const deleteStmt = db.prepare('DELETE FROM products WHERE id = ?')
+  const upsertStmt = db.prepare(`
+    INSERT INTO products (barcode, name, brand, category, price_cents, image_url, source)
+    VALUES (@barcode, @name, @brand, @category, @priceCents, @imageUrl, @source)
+    ON CONFLICT(barcode) DO UPDATE SET
+      name = excluded.name,
+      brand = excluded.brand,
+      category = excluded.category,
+      price_cents = excluded.price_cents,
+      image_url = excluded.image_url,
+      updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+  `)
+  const bulkUpsertTx = db.transaction((inputs: NewProduct[]): void => {
+    for (const input of inputs) {
+      upsertStmt.run({
+        barcode: input.barcode,
+        name: input.name,
+        brand: input.brand,
+        category: input.category,
+        priceCents: input.priceCents,
+        imageUrl: input.imageUrl,
+        source: input.source
+      })
+    }
+  })
 
   return {
     list(): Product[] {
@@ -103,6 +129,11 @@ export function createProductsRepository(db: Database.Database): ProductsReposit
 
     delete(id: number): void {
       deleteStmt.run(id)
+    },
+
+    bulkUpsert(inputs: NewProduct[]): number {
+      bulkUpsertTx(inputs)
+      return inputs.length
     }
   }
 }

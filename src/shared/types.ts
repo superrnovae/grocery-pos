@@ -50,6 +50,17 @@ export interface AppSettings {
   locale: Locale
 }
 
+export interface BulkImportSummary {
+  total: number
+  imported: number
+  errors: string[]
+}
+
+export interface ImportProgress {
+  processed: number
+  total: number
+}
+
 export interface OpenFoodFactsLookupResult {
   found: boolean
   product?: {

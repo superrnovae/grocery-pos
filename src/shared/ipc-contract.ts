@@ -1,5 +1,7 @@
 import type {
   AppSettings,
+  BulkImportSummary,
+  ImportProgress,
   NewProduct,
   NewSalePayload,
   OpenFoodFactsLookupResult,
@@ -14,6 +16,8 @@ export const IpcChannel = {
   ProductsUpdate: 'products:update',
   ProductsDelete: 'products:delete',
   ProductsFindByBarcode: 'products:findByBarcode',
+  ProductsBulkImport: 'products:bulkImport',
+  ProductsImportProgress: 'products:importProgress',
   LookupByBarcode: 'lookup:byBarcode',
   SalesCreate: 'sales:create',
   SalesList: 'sales:list',
@@ -41,6 +45,8 @@ export interface IpcApi {
     update(id: number, patch: ProductUpdate): Promise<Product>
     delete(id: number): Promise<void>
     findByBarcode(barcode: string): Promise<Product | null>
+    bulkImport(): Promise<BulkImportSummary | null>
+    onImportProgress(callback: (progress: ImportProgress) => void): () => void
   }
   lookup: {
     byBarcode(barcode: string): Promise<OpenFoodFactsLookupResult>

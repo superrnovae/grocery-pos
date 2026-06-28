@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Pencil, Trash2 } from '@lucide/vue'
 import { useProductsStore } from '../stores/products'
 import { formatPrice } from '../utils/format'
-import type { NewProduct, Product } from '@shared/types'
+import type { BulkImportSummary, NewProduct, Product } from '@shared/types'
 import ProductFormModal from '../components/ProductFormModal.vue'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Alert, AlertDescription } from '../components/ui/alert'
+import { Progress } from '../components/ui/progress'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '../components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -35,6 +43,16 @@ const lookupBusy = ref(false)
 const statusMessage = ref('')
 const modal = ref<ModalState | null>(null)
 
+const importOpen = ref(false)
+const importBusy = ref(false)
+const importProgress = ref<{ processed: number; total: number } | null>(null)
+const importSummary = ref<BulkImportSummary | null>(null)
+const importError = ref('')
+
+const unsubscribeImportProgress = window.api.products.onImportProgress((progress) => {
+  importProgress.value = progress
+})
+
 onMounted(async () => {
   if (products.loaded) return
   try {
@@ -43,6 +61,10 @@ onMounted(async () => {
     console.error('Failed to load products', error)
     statusMessage.value = t('common.loadError')
   }
+})
+
+onUnmounted(() => {
+  unsubscribeImportProgress()
 })
 
 const filtered = computed(() => {
@@ -165,6 +187,37 @@ async function lookupBarcode(): Promise<void> {
     barcodeInput.value = ''
   }
 }
+
+function openImport(): void {
+  importSummary.value = null
+  importProgress.value = null
+  importError.value = ''
+  importOpen.value = true
+}
+
+async function runImport(): Promise<void> {
+  importBusy.value = true
+  importError.value = ''
+  importSummary.value = null
+  importProgress.value = null
+
+  try {
+    const summary = await window.api.products.bulkImport()
+    if (summary) {
+      importSummary.value = summary
+      await products.load()
+    }
+  } catch (error) {
+    console.error('Bulk import failed', error)
+    importError.value = t('products.import.error')
+  } finally {
+    importBusy.value = false
+  }
+}
+
+function closeImport(): void {
+  importOpen.value = false
+}
 </script>
 
 <template>
@@ -186,7 +239,10 @@ async function lookupBarcode(): Promise<void> {
         />
         <Button type="submit" :disabled="lookupBusy">{{ t('products.lookupButton') }}</Button>
       </form>
-      <Button type="button" variant="outline" class="ml-auto" @click="openCreateBlank">
+      <Button type="button" variant="outline" class="ml-auto" @click="openImport">
+        {{ t('products.importCatalog') }}
+      </Button>
+      <Button type="button" variant="outline" @click="openCreateBlank">
         {{ t('products.addManually') }}
       </Button>
     </header>
@@ -252,5 +308,51 @@ async function lookupBarcode(): Promise<void> {
       @save="onSave"
       @cancel="modal = null"
     />
+
+    <Dialog :open="importOpen" @update:open="(open) => !open && closeImport()">
+      <DialogContent class="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{{ t('products.import.title') }}</DialogTitle>
+        </DialogHeader>
+
+        <p class="text-muted-foreground text-sm">{{ t('products.import.description') }}</p>
+
+        <Progress
+          v-if="importBusy && importProgress"
+          :model-value="importProgress.processed"
+          :max="importProgress.total"
+        />
+        <p v-if="importBusy && importProgress" class="text-muted-foreground text-sm">
+          {{ t('products.import.progress', importProgress) }}
+        </p>
+
+        <Alert v-if="importSummary">
+          <AlertDescription>
+            <p>{{ t('products.import.summary', importSummary) }}</p>
+            <template v-if="importSummary.errors.length > 0">
+              <p class="mt-2 font-medium">
+                {{ t('products.import.errorsTitle', { count: importSummary.errors.length }) }}
+              </p>
+              <ul class="mt-1 list-disc pl-5">
+                <li v-for="(error, index) in importSummary.errors" :key="index">{{ error }}</li>
+              </ul>
+            </template>
+          </AlertDescription>
+        </Alert>
+
+        <Alert v-if="importError" variant="destructive">
+          <AlertDescription>{{ importError }}</AlertDescription>
+        </Alert>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" @click="closeImport">
+            {{ t('products.import.close') }}
+          </Button>
+          <Button type="button" :disabled="importBusy" @click="runImport">
+            {{ t('products.import.choose') }}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </section>
 </template>
