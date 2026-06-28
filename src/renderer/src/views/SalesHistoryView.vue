@@ -4,6 +4,16 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useSalesStore } from '../stores/sales'
 import { formatPrice } from '../utils/format'
+import { Button } from '../components/ui/button'
+import { Alert, AlertDescription } from '../components/ui/alert'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '../components/ui/table'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -43,85 +53,49 @@ async function exportCsv(): Promise<void> {
 </script>
 
 <template>
-  <section class="sales-history-view">
-    <header class="toolbar">
-      <h1>{{ t('nav.history') }}</h1>
-      <button type="button" :disabled="exporting" @click="exportCsv">
+  <section class="flex flex-col gap-4">
+    <header class="flex items-center justify-between">
+      <h1 class="text-xl font-bold">{{ t('nav.history') }}</h1>
+      <Button type="button" variant="outline" :disabled="exporting" @click="exportCsv">
         {{ t('history.exportCsv') }}
-      </button>
+      </Button>
     </header>
 
-    <p v-if="statusMessage" class="status-message">{{ statusMessage }}</p>
+    <Alert v-if="statusMessage">
+      <AlertDescription>{{ statusMessage }}</AlertDescription>
+    </Alert>
 
-    <table class="sales-table">
-      <thead>
-        <tr>
-          <th>{{ t('history.table.date') }}</th>
-          <th>{{ t('history.table.items') }}</th>
-          <th>{{ t('history.table.total') }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>{{ t('history.table.date') }}</TableHead>
+          <TableHead>{{ t('history.table.items') }}</TableHead>
+          <TableHead>{{ t('history.table.total') }}</TableHead>
+          <TableHead />
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow
           v-for="sale in sales.items"
           :key="sale.id"
-          class="sale-row"
+          class="cursor-pointer"
           @click="openReceipt(sale.id)"
         >
-          <td>{{ formatDate(sale.createdAt) }}</td>
-          <td>{{ sale.items.length }}</td>
-          <td>{{ formatPrice(sale.totalCents, locale) }}</td>
-          <td>
-            <button type="button" @click.stop="openReceipt(sale.id)">
+          <TableCell>{{ formatDate(sale.createdAt) }}</TableCell>
+          <TableCell>{{ sale.items.length }}</TableCell>
+          <TableCell>{{ formatPrice(sale.totalCents, locale) }}</TableCell>
+          <TableCell>
+            <Button type="button" variant="ghost" size="sm" @click.stop="openReceipt(sale.id)">
               {{ t('history.viewReceipt') }}
-            </button>
-          </td>
-        </tr>
-        <tr v-if="sales.items.length === 0">
-          <td colspan="4" class="empty">{{ t('history.empty') }}</td>
-        </tr>
-      </tbody>
-    </table>
+            </Button>
+          </TableCell>
+        </TableRow>
+        <TableRow v-if="sales.items.length === 0">
+          <TableCell colspan="4" class="text-muted-foreground text-center">
+            {{ t('history.empty') }}
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
   </section>
 </template>
-
-<style scoped>
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.status-message {
-  margin-bottom: 12px;
-  color: var(--color-text-soft);
-  font-size: 13px;
-}
-
-.sales-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.sales-table th,
-.sales-table td {
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.sale-row {
-  cursor: pointer;
-}
-
-.sale-row:hover {
-  background: var(--color-bg-mute);
-}
-
-.sales-table .empty {
-  text-align: center;
-  color: var(--color-text-soft);
-}
-</style>

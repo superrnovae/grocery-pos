@@ -4,6 +4,17 @@ import { useI18n } from 'vue-i18n'
 import { useSalesStore } from '../stores/sales'
 import { formatPrice } from '../utils/format'
 import type { Sale } from '@shared/types'
+import { Button } from '../components/ui/button'
+import { Alert, AlertDescription } from '../components/ui/alert'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '../components/ui/table'
 
 const props = defineProps<{ id: string }>()
 const { t, locale } = useI18n()
@@ -41,80 +52,46 @@ async function exportPdf(): Promise<void> {
 </script>
 
 <template>
-  <section v-if="sale" class="receipt-view">
-    <header class="toolbar">
-      <h1>{{ t('history.receiptTitle', { id: sale.id }) }}</h1>
-      <button type="button" :disabled="exporting" @click="exportPdf">
+  <section v-if="sale" class="flex flex-col gap-4">
+    <header class="flex items-center justify-between">
+      <h1 class="text-xl font-bold">{{ t('history.receiptTitle', { id: sale.id }) }}</h1>
+      <Button type="button" variant="outline" :disabled="exporting" @click="exportPdf">
         {{ t('history.exportPdf') }}
-      </button>
+      </Button>
     </header>
-    <p class="muted">{{ formatDate(sale.createdAt) }}</p>
-    <p v-if="statusMessage" class="status-message">{{ statusMessage }}</p>
+    <p class="text-muted-foreground -mt-2 text-sm">{{ formatDate(sale.createdAt) }}</p>
 
-    <table class="receipt-table">
-      <thead>
-        <tr>
-          <th>{{ t('checkout.table.product') }}</th>
-          <th>{{ t('checkout.table.quantity') }}</th>
-          <th>{{ t('checkout.table.unitPrice') }}</th>
-          <th>{{ t('checkout.table.lineTotal') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in sale.items" :key="item.id">
-          <td>{{ item.productNameSnapshot }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>{{ formatPrice(item.unitPriceCentsSnapshot, locale) }}</td>
-          <td>{{ formatPrice(item.lineTotalCents, locale) }}</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="3">{{ t('checkout.total') }}</td>
-          <td>{{ formatPrice(sale.totalCents, locale) }}</td>
-        </tr>
-      </tfoot>
-    </table>
+    <Alert v-if="statusMessage">
+      <AlertDescription>{{ statusMessage }}</AlertDescription>
+    </Alert>
+
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>{{ t('checkout.table.product') }}</TableHead>
+          <TableHead>{{ t('checkout.table.quantity') }}</TableHead>
+          <TableHead>{{ t('checkout.table.unitPrice') }}</TableHead>
+          <TableHead>{{ t('checkout.table.lineTotal') }}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow v-for="item in sale.items" :key="item.id">
+          <TableCell>{{ item.productNameSnapshot }}</TableCell>
+          <TableCell>{{ item.quantity }}</TableCell>
+          <TableCell>{{ formatPrice(item.unitPriceCentsSnapshot, locale) }}</TableCell>
+          <TableCell>{{ formatPrice(item.lineTotalCents, locale) }}</TableCell>
+        </TableRow>
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell colspan="3">{{ t('checkout.total') }}</TableCell>
+          <TableCell>{{ formatPrice(sale.totalCents, locale) }}</TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
   </section>
-  <p v-else-if="statusMessage" class="status-message">{{ statusMessage }}</p>
-  <p v-else class="not-found">{{ t('history.notFound') }}</p>
+  <Alert v-else-if="statusMessage">
+    <AlertDescription>{{ statusMessage }}</AlertDescription>
+  </Alert>
+  <p v-else class="text-muted-foreground">{{ t('history.notFound') }}</p>
 </template>
-
-<style scoped>
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.muted {
-  color: var(--color-text-soft);
-  font-size: 13px;
-  margin-bottom: 16px;
-}
-
-.status-message {
-  color: var(--color-text-soft);
-  font-size: 13px;
-  margin-bottom: 16px;
-}
-
-.receipt-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.receipt-table th,
-.receipt-table td {
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.receipt-table tfoot td {
-  font-weight: 700;
-  border-bottom: none;
-  border-top: 2px solid var(--color-text);
-}
-</style>
