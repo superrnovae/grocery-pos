@@ -1,76 +1,50 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import type { AcceptableValue } from 'reka-ui'
 import { useSettingsStore } from '../stores/settings'
+import { ToggleGroup, ToggleGroupItem } from '../components/ui/toggle-group'
+import type { Locale, Theme } from '@shared/types'
 
 const { t } = useI18n()
 const settings = useSettingsStore()
+
+function onThemeChange(value: AcceptableValue | AcceptableValue[]): void {
+  if (typeof value === 'string' && value) settings.setTheme(value as Theme)
+}
+
+function onLocaleChange(value: AcceptableValue | AcceptableValue[]): void {
+  if (typeof value === 'string' && value) settings.setLocale(value as Locale)
+}
 </script>
 
 <template>
-  <section class="settings-view">
-    <h1>{{ t('nav.settings') }}</h1>
+  <section class="max-w-md">
+    <h1 class="mb-6 text-xl font-bold">{{ t('nav.settings') }}</h1>
 
-    <div class="settings-group">
-      <h2>{{ t('settings.theme') }}</h2>
-      <div class="options">
-        <button
-          type="button"
-          :class="{ active: settings.theme === 'light' }"
-          @click="settings.setTheme('light')"
-        >
-          {{ t('theme.light') }}
-        </button>
-        <button
-          type="button"
-          :class="{ active: settings.theme === 'dark' }"
-          @click="settings.setTheme('dark')"
-        >
-          {{ t('theme.dark') }}
-        </button>
-      </div>
+    <div class="mb-6">
+      <h2 class="text-muted-foreground mb-2 text-sm font-medium">{{ t('settings.theme') }}</h2>
+      <ToggleGroup
+        type="single"
+        variant="outline"
+        :model-value="settings.theme"
+        @update:model-value="onThemeChange"
+      >
+        <ToggleGroupItem value="light">{{ t('theme.light') }}</ToggleGroupItem>
+        <ToggleGroupItem value="dark">{{ t('theme.dark') }}</ToggleGroupItem>
+      </ToggleGroup>
     </div>
 
-    <div class="settings-group">
-      <h2>{{ t('settings.language') }}</h2>
-      <div class="options">
-        <button
-          type="button"
-          :class="{ active: settings.locale === 'fr' }"
-          @click="settings.setLocale('fr')"
-        >
-          {{ t('language.fr') }}
-        </button>
-        <button
-          type="button"
-          :class="{ active: settings.locale === 'en' }"
-          @click="settings.setLocale('en')"
-        >
-          {{ t('language.en') }}
-        </button>
-      </div>
+    <div>
+      <h2 class="text-muted-foreground mb-2 text-sm font-medium">{{ t('settings.language') }}</h2>
+      <ToggleGroup
+        type="single"
+        variant="outline"
+        :model-value="settings.locale"
+        @update:model-value="onLocaleChange"
+      >
+        <ToggleGroupItem value="fr">{{ t('language.fr') }}</ToggleGroupItem>
+        <ToggleGroupItem value="en">{{ t('language.en') }}</ToggleGroupItem>
+      </ToggleGroup>
     </div>
   </section>
 </template>
-
-<style scoped>
-.settings-group {
-  margin-bottom: 24px;
-}
-
-.settings-group h2 {
-  font-size: 14px;
-  color: var(--color-text-soft);
-  margin-bottom: 8px;
-}
-
-.options {
-  display: flex;
-  gap: 8px;
-}
-
-.options button.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-primary-contrast);
-}
-</style>
