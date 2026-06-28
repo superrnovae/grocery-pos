@@ -2,6 +2,11 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { NewProduct } from '@shared/types'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
+import { Alert, AlertDescription } from './ui/alert'
 
 const props = defineProps<{
   title: string
@@ -16,12 +21,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const titleId = 'product-form-modal-title'
-
-function onKeydown(event: KeyboardEvent): void {
-  if (event.key === 'Escape') emit('cancel')
-}
-
 const name = ref(props.initial.name)
 const brand = ref(props.initial.brand ?? '')
 const category = ref(props.initial.category ?? '')
@@ -30,6 +29,10 @@ const priceText = ref(
   props.initial.priceCents > 0 ? (props.initial.priceCents / 100).toFixed(2) : ''
 )
 const error = ref('')
+
+function onOpenChange(open: boolean): void {
+  if (!open) emit('cancel')
+}
 
 function submit(): void {
   const trimmedName = name.value.trim()
@@ -57,95 +60,58 @@ function submit(): void {
 </script>
 
 <template>
-  <div class="modal-backdrop" @click.self="emit('cancel')" @keydown="onKeydown">
-    <div class="modal" role="dialog" aria-modal="true" :aria-labelledby="titleId">
-      <h2 :id="titleId">{{ title }}</h2>
+  <Dialog :open="true" @update:open="onOpenChange">
+    <DialogContent class="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle>{{ title }}</DialogTitle>
+      </DialogHeader>
 
-      <img v-if="initial.imageUrl" :src="initial.imageUrl" class="preview" alt="" />
+      <img
+        v-if="initial.imageUrl"
+        :src="initial.imageUrl"
+        alt=""
+        class="mx-auto max-h-28 object-contain"
+      />
 
-      <label>
-        {{ t('products.form.name') }}
-        <input v-model="name" type="text" autofocus />
-      </label>
-      <label>
-        {{ t('products.form.brand') }}
-        <input v-model="brand" type="text" />
-      </label>
-      <label>
-        {{ t('products.form.category') }}
-        <input v-model="category" type="text" />
-      </label>
-      <label>
-        {{ t('products.form.barcode') }}
-        <input v-model="barcode" type="text" :disabled="!barcodeEditable" />
-      </label>
-      <label>
-        {{ t('products.form.price') }}
-        <input v-model="priceText" type="text" inputmode="decimal" placeholder="0.00" />
-      </label>
-
-      <p v-if="error" class="form-error">{{ error }}</p>
-
-      <div class="modal-actions">
-        <button type="button" @click="emit('cancel')">{{ t('common.cancel') }}</button>
-        <button type="button" class="primary" @click="submit">{{ t('common.save') }}</button>
+      <div class="grid gap-4">
+        <div class="grid gap-1.5">
+          <Label for="product-name">{{ t('products.form.name') }}</Label>
+          <Input id="product-name" v-model="name" type="text" autofocus />
+        </div>
+        <div class="grid gap-1.5">
+          <Label for="product-brand">{{ t('products.form.brand') }}</Label>
+          <Input id="product-brand" v-model="brand" type="text" />
+        </div>
+        <div class="grid gap-1.5">
+          <Label for="product-category">{{ t('products.form.category') }}</Label>
+          <Input id="product-category" v-model="category" type="text" />
+        </div>
+        <div class="grid gap-1.5">
+          <Label for="product-barcode">{{ t('products.form.barcode') }}</Label>
+          <Input id="product-barcode" v-model="barcode" type="text" :disabled="!barcodeEditable" />
+        </div>
+        <div class="grid gap-1.5">
+          <Label for="product-price">{{ t('products.form.price') }}</Label>
+          <Input
+            id="product-price"
+            v-model="priceText"
+            type="text"
+            inputmode="decimal"
+            placeholder="0.00"
+          />
+        </div>
       </div>
-    </div>
-  </div>
+
+      <Alert v-if="error" variant="destructive">
+        <AlertDescription>{{ error }}</AlertDescription>
+      </Alert>
+
+      <DialogFooter>
+        <Button type="button" variant="outline" @click="emit('cancel')">
+          {{ t('common.cancel') }}
+        </Button>
+        <Button type="button" @click="submit">{{ t('common.save') }}</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>
-
-<style scoped>
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal {
-  background: var(--color-bg-soft);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 24px;
-  width: 360px;
-  max-height: 90vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.modal h2 {
-  font-size: 18px;
-}
-
-.preview {
-  max-width: 100%;
-  max-height: 120px;
-  object-fit: contain;
-  align-self: center;
-}
-
-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
-  color: var(--color-text-soft);
-}
-
-.form-error {
-  color: var(--color-danger);
-  font-size: 13px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 8px;
-}
-</style>
