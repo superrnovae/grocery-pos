@@ -1,5 +1,6 @@
 {
   "nav": {
+    "dashboard": "Tableau de bord",
     "checkout": "Caisse",
     "products": "Produits",
     "history": "Historique",
@@ -145,6 +146,12 @@
       "phone": "Téléphone",
       "points": "Points"
     }
+  },
+  "dashboard": {
+    "todayRevenue": "Chiffre d'affaires du jour",
+    "yesterdayRevenue": "Chiffre d'affaires d'hier",
+    "topProducts": "Produits les plus vendus",
+    "noSales": "Aucune vente pour le moment."
   },
   "settings": {
     "theme": "Thème",

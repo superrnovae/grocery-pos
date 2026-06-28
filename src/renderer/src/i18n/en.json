@@ -1,5 +1,6 @@
 {
   "nav": {
+    "dashboard": "Dashboard",
     "checkout": "Checkout",
     "products": "Products",
     "history": "History",
@@ -145,6 +146,12 @@
       "phone": "Phone",
       "points": "Points"
     }
+  },
+  "dashboard": {
+    "todayRevenue": "Today's revenue",
+    "yesterdayRevenue": "Yesterday's revenue",
+    "topProducts": "Top products",
+    "noSales": "No sales yet."
   },
   "settings": {
     "theme": "Theme",

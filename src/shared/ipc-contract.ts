@@ -2,6 +2,7 @@ import type {
   AppSettings,
   BulkImportSummary,
   Customer,
+  DashboardStats,
   ImportProgress,
   NewCustomer,
   NewProduct,
@@ -27,6 +28,7 @@ export const IpcChannel = {
   CustomersList: 'customers:list',
   CustomersCreate: 'customers:create',
   CustomersFindByPhone: 'customers:findByPhone',
+  AnalyticsGetDashboardStats: 'analytics:getDashboardStats',
   SettingsGet: 'settings:get',
   SettingsUpdate: 'settings:update',
   ExportSalesCsv: 'export:salesCsv',
@@ -66,6 +68,9 @@ export interface IpcApi {
     list(): Promise<Customer[]>
     create(input: NewCustomer): Promise<Customer>
     findByPhone(phone: string): Promise<Customer | null>
+  }
+  analytics: {
+    getDashboardStats(): Promise<DashboardStats>
   }
   settings: {
     get(): Promise<AppSettings>

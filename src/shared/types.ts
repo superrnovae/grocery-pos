@@ -57,6 +57,17 @@ export interface Customer {
 
 export type NewCustomer = Pick<Customer, 'name' | 'phone'>
 
+export interface TopProduct {
+  name: string
+  quantity: number
+}
+
+export interface DashboardStats {
+  todayRevenueCents: number
+  yesterdayRevenueCents: number
+  topProducts: TopProduct[]
+}
+
 export type Theme = 'light' | 'dark'
 export type Locale = 'fr' | 'en'
 

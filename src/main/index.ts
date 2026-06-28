@@ -7,12 +7,14 @@ import { createProductsRepository } from './db/productsRepository'
 import { createSalesRepository } from './db/salesRepository'
 import { createSettingsRepository } from './db/settingsRepository'
 import { createCustomersRepository } from './db/customersRepository'
+import { createAnalyticsRepository } from './db/analyticsRepository'
 import { registerProductsHandlers } from './ipc/productsHandlers'
 import { registerSalesHandlers } from './ipc/salesHandlers'
 import { registerSettingsHandlers } from './ipc/settingsHandlers'
 import { registerLookupHandlers } from './ipc/lookupHandlers'
 import { registerExportHandlers } from './ipc/exportHandlers'
 import { registerCustomersHandlers } from './ipc/customersHandlers'
+import { registerAnalyticsHandlers } from './ipc/analyticsHandlers'
 
 function createWindow(): void {
   // Create the browser window.
@@ -67,10 +69,12 @@ app.whenReady().then(() => {
   const customersRepository = createCustomersRepository(db)
   const salesRepository = createSalesRepository(db, productsRepository, customersRepository)
   const settingsRepository = createSettingsRepository(db)
+  const analyticsRepository = createAnalyticsRepository(db)
 
   registerProductsHandlers(productsRepository)
   registerSalesHandlers(salesRepository, settingsRepository)
   registerCustomersHandlers(customersRepository)
+  registerAnalyticsHandlers(analyticsRepository)
   registerSettingsHandlers(settingsRepository)
   registerLookupHandlers(settingsRepository)
   registerExportHandlers(productsRepository, salesRepository, settingsRepository)

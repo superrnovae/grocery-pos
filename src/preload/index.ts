@@ -30,6 +30,9 @@ const api: IpcApi = {
     create: (input) => ipcRenderer.invoke(IpcChannel.CustomersCreate, input),
     findByPhone: (phone) => ipcRenderer.invoke(IpcChannel.CustomersFindByPhone, phone)
   },
+  analytics: {
+    getDashboardStats: () => ipcRenderer.invoke(IpcChannel.AnalyticsGetDashboardStats)
+  },
   settings: {
     get: () => ipcRenderer.invoke(IpcChannel.SettingsGet),
     update: (patch) => ipcRenderer.invoke(IpcChannel.SettingsUpdate, patch)
