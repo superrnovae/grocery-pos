@@ -25,6 +25,26 @@ const MESSAGES = {
       title: 'Order delivered',
       body: `${customerName}'s order was marked as delivered.`
     })
+  },
+  updateAvailable: {
+    fr: (version: string) => ({
+      title: 'Mise à jour disponible',
+      body: `La version ${version} est en cours de téléchargement.`
+    }),
+    en: (version: string) => ({
+      title: 'Update available',
+      body: `Version ${version} is downloading.`
+    })
+  },
+  updateDownloaded: {
+    fr: (version: string) => ({
+      title: 'Mise à jour prête',
+      body: `La version ${version} sera installée au prochain redémarrage.`
+    }),
+    en: (version: string) => ({
+      title: 'Update ready',
+      body: `Version ${version} will be installed on next restart.`
+    })
   }
 } as const
 
@@ -49,5 +69,15 @@ export function notifyLookupFailed(barcode: string, locale: Locale): void {
 
 export function notifyOrderReady(customerName: string, locale: Locale): void {
   const { title, body } = MESSAGES.orderReady[locale](customerName)
+  show(title, body)
+}
+
+export function notifyUpdateAvailable(version: string, locale: Locale): void {
+  const { title, body } = MESSAGES.updateAvailable[locale](version)
+  show(title, body)
+}
+
+export function notifyUpdateDownloaded(version: string, locale: Locale): void {
+  const { title, body } = MESSAGES.updateDownloaded[locale](version)
   show(title, body)
 }

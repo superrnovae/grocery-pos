@@ -14,6 +14,8 @@ const settings = useSettingsStore()
 const backupMessage = ref('')
 const backingUp = ref(false)
 const restoring = ref(false)
+const updateMessage = ref('')
+const checkingForUpdates = ref(false)
 
 function onThemeChange(value: AcceptableValue | AcceptableValue[]): void {
   if (typeof value === 'string' && value) settings.setTheme(value as Theme)
@@ -47,6 +49,18 @@ async function restoreBackup(): Promise<void> {
     console.error('Restore failed', error)
     backupMessage.value = t('settings.backup.restoreError')
     restoring.value = false
+  }
+}
+
+async function checkForUpdates(): Promise<void> {
+  checkingForUpdates.value = true
+  updateMessage.value = t('settings.updates.checking')
+  try {
+    await window.api.updates.check()
+  } catch (error) {
+    console.error('Update check failed', error)
+  } finally {
+    checkingForUpdates.value = false
   }
 }
 </script>
@@ -95,6 +109,23 @@ async function restoreBackup(): Promise<void> {
       </div>
       <Alert v-if="backupMessage" class="mt-3">
         <AlertDescription>{{ backupMessage }}</AlertDescription>
+      </Alert>
+    </div>
+
+    <div class="mt-6">
+      <h2 class="text-muted-foreground mb-2 text-sm font-medium">
+        {{ t('settings.updates.title') }}
+      </h2>
+      <Button
+        type="button"
+        variant="outline"
+        :disabled="checkingForUpdates"
+        @click="checkForUpdates"
+      >
+        {{ t('settings.updates.check') }}
+      </Button>
+      <Alert v-if="updateMessage" class="mt-3">
+        <AlertDescription>{{ updateMessage }}</AlertDescription>
       </Alert>
     </div>
   </section>

@@ -188,6 +188,11 @@
       "createError": "La sauvegarde a échoué. Réessayez.",
       "restoreError": "La restauration a échoué. Réessayez.",
       "confirmRestore": "La restauration remplacera toutes les données actuelles par celles de la sauvegarde et redémarrera l'application. Continuer ?"
+    },
+    "updates": {
+      "title": "Mises à jour",
+      "check": "Vérifier les mises à jour",
+      "checking": "Vérification en cours... une notification apparaîtra si une mise à jour est trouvée."
     }
   }
 }

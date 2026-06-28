@@ -13,6 +13,11 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+publish:
+  provider: generic
+  # Placeholder: point this at a real static file host (or swap providers, e.g. GitHub Releases)
+  # serving the artifacts in `release/` plus the generated latest.yml before shipping updates.
+  url: https://updates.example.com/grocery-pos
 win:
   executableName: grocery-pos
   target: nsis

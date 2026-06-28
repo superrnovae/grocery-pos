@@ -188,6 +188,11 @@
       "createError": "Backup failed. Please try again.",
       "restoreError": "Restore failed. Please try again.",
       "confirmRestore": "Restoring will replace all current data with the backup's data and restart the app. Continue?"
+    },
+    "updates": {
+      "title": "Updates",
+      "check": "Check for updates",
+      "checking": "Checking for updates... a notification will appear if one is found."
     }
   }
 }

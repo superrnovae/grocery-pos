@@ -18,6 +18,8 @@ import { registerCustomersHandlers } from './ipc/customersHandlers'
 import { registerAnalyticsHandlers } from './ipc/analyticsHandlers'
 import { registerOrdersHandlers } from './ipc/ordersHandlers'
 import { registerBackupHandlers } from './ipc/backupHandlers'
+import { registerUpdatesHandlers } from './ipc/updatesHandlers'
+import { checkForUpdates, initAutoUpdater } from './services/updateService'
 
 function createWindow(): void {
   // Create the browser window.
@@ -81,9 +83,13 @@ app.whenReady().then(() => {
   registerAnalyticsHandlers(analyticsRepository)
   registerOrdersHandlers(ordersRepository, settingsRepository)
   registerBackupHandlers(db, dbFilePath)
+  registerUpdatesHandlers()
   registerSettingsHandlers(settingsRepository)
   registerLookupHandlers(settingsRepository)
   registerExportHandlers(productsRepository, salesRepository, settingsRepository)
+
+  initAutoUpdater(() => settingsRepository.get().locale)
+  if (!is.dev) checkForUpdates()
 
   createWindow()
 

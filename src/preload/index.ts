@@ -43,6 +43,9 @@ const api: IpcApi = {
     create: () => ipcRenderer.invoke(IpcChannel.BackupCreate),
     restore: () => ipcRenderer.invoke(IpcChannel.BackupRestore)
   },
+  updates: {
+    check: () => ipcRenderer.invoke(IpcChannel.UpdatesCheck)
+  },
   settings: {
     get: () => ipcRenderer.invoke(IpcChannel.SettingsGet),
     update: (patch) => ipcRenderer.invoke(IpcChannel.SettingsUpdate, patch)

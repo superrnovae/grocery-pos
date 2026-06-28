@@ -38,6 +38,7 @@ export const IpcChannel = {
   OrdersUpdateStatus: 'orders:updateStatus',
   BackupCreate: 'backup:create',
   BackupRestore: 'backup:restore',
+  UpdatesCheck: 'updates:check',
   SettingsGet: 'settings:get',
   SettingsUpdate: 'settings:update',
   ExportSalesCsv: 'export:salesCsv',
@@ -90,6 +91,9 @@ export interface IpcApi {
   backup: {
     create(): Promise<boolean>
     restore(): Promise<boolean>
+  }
+  updates: {
+    check(): Promise<void>
   }
   settings: {
     get(): Promise<AppSettings>
