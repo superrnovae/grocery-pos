@@ -39,6 +39,10 @@ const api: IpcApi = {
     getById: (id) => ipcRenderer.invoke(IpcChannel.OrdersGetById, id),
     updateStatus: (id, status) => ipcRenderer.invoke(IpcChannel.OrdersUpdateStatus, id, status)
   },
+  backup: {
+    create: () => ipcRenderer.invoke(IpcChannel.BackupCreate),
+    restore: () => ipcRenderer.invoke(IpcChannel.BackupRestore)
+  },
   settings: {
     get: () => ipcRenderer.invoke(IpcChannel.SettingsGet),
     update: (patch) => ipcRenderer.invoke(IpcChannel.SettingsUpdate, patch)

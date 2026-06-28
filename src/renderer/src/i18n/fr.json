@@ -179,6 +179,15 @@
   },
   "settings": {
     "theme": "Thème",
-    "language": "Langue"
+    "language": "Langue",
+    "backup": {
+      "title": "Sauvegarde et restauration",
+      "create": "Créer une sauvegarde...",
+      "restore": "Restaurer une sauvegarde...",
+      "created": "Sauvegarde enregistrée avec succès.",
+      "createError": "La sauvegarde a échoué. Réessayez.",
+      "restoreError": "La restauration a échoué. Réessayez.",
+      "confirmRestore": "La restauration remplacera toutes les données actuelles par celles de la sauvegarde et redémarrera l'application. Continuer ?"
+    }
   }
 }

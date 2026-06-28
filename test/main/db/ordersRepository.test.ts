@@ -16,7 +16,7 @@ describe('ordersRepository', () => {
   let orders: OrdersRepository
 
   beforeEach(() => {
-    db = createDatabase(':memory:')
+    db = createDatabase(':memory:').db
     products = createProductsRepository(db)
     orders = createOrdersRepository(db, products)
   })

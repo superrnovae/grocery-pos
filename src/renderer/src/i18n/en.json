@@ -179,6 +179,15 @@
   },
   "settings": {
     "theme": "Theme",
-    "language": "Language"
+    "language": "Language",
+    "backup": {
+      "title": "Backup & restore",
+      "create": "Create backup...",
+      "restore": "Restore from backup...",
+      "created": "Backup saved successfully.",
+      "createError": "Backup failed. Please try again.",
+      "restoreError": "Restore failed. Please try again.",
+      "confirmRestore": "Restoring will replace all current data with the backup's data and restart the app. Continue?"
+    }
   }
 }

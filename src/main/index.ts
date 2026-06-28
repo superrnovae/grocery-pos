@@ -17,6 +17,7 @@ import { registerExportHandlers } from './ipc/exportHandlers'
 import { registerCustomersHandlers } from './ipc/customersHandlers'
 import { registerAnalyticsHandlers } from './ipc/analyticsHandlers'
 import { registerOrdersHandlers } from './ipc/ordersHandlers'
+import { registerBackupHandlers } from './ipc/backupHandlers'
 
 function createWindow(): void {
   // Create the browser window.
@@ -66,7 +67,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  const db = createDatabase()
+  const { db, filePath: dbFilePath } = createDatabase()
   const productsRepository = createProductsRepository(db)
   const customersRepository = createCustomersRepository(db)
   const salesRepository = createSalesRepository(db, productsRepository, customersRepository)
@@ -79,6 +80,7 @@ app.whenReady().then(() => {
   registerCustomersHandlers(customersRepository)
   registerAnalyticsHandlers(analyticsRepository)
   registerOrdersHandlers(ordersRepository, settingsRepository)
+  registerBackupHandlers(db, dbFilePath)
   registerSettingsHandlers(settingsRepository)
   registerLookupHandlers(settingsRepository)
   registerExportHandlers(productsRepository, salesRepository, settingsRepository)

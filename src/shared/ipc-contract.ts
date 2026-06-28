@@ -36,6 +36,8 @@ export const IpcChannel = {
   OrdersList: 'orders:list',
   OrdersGetById: 'orders:getById',
   OrdersUpdateStatus: 'orders:updateStatus',
+  BackupCreate: 'backup:create',
+  BackupRestore: 'backup:restore',
   SettingsGet: 'settings:get',
   SettingsUpdate: 'settings:update',
   ExportSalesCsv: 'export:salesCsv',
@@ -84,6 +86,10 @@ export interface IpcApi {
     list(): Promise<Order[]>
     getById(id: number): Promise<Order | null>
     updateStatus(id: number, status: OrderStatus): Promise<Order>
+  }
+  backup: {
+    create(): Promise<boolean>
+    restore(): Promise<boolean>
   }
   settings: {
     get(): Promise<AppSettings>

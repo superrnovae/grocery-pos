@@ -84,11 +84,16 @@ function ensureColumn(
   }
 }
 
+export interface DatabaseHandle {
+  db: Database.Database
+  filePath: string
+}
+
 /**
  * Opens (and migrates) the app database. Pass an explicit `filePath` (e.g. ':memory:')
  * in tests; omit it in the app itself to use the per-user data directory.
  */
-export function createDatabase(filePath?: string): Database.Database {
+export function createDatabase(filePath?: string): DatabaseHandle {
   const dbPath = filePath ?? join(app.getPath('userData'), 'grocery-pos.sqlite3')
   const db = new Database(dbPath)
   db.pragma('journal_mode = WAL')
@@ -96,5 +101,5 @@ export function createDatabase(filePath?: string): Database.Database {
   db.exec(SCHEMA)
   ensureColumn(db, 'sales', 'customer_id', 'customer_id INTEGER')
   ensureColumn(db, 'sales', 'discount_cents', 'discount_cents INTEGER NOT NULL DEFAULT 0')
-  return db
+  return { db, filePath: dbPath }
 }

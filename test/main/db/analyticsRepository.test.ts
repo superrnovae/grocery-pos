@@ -23,7 +23,7 @@ describe('analyticsRepository', () => {
   let analytics: AnalyticsRepository
 
   beforeEach(() => {
-    db = createDatabase(':memory:')
+    db = createDatabase(':memory:').db
     products = createProductsRepository(db)
     customers = createCustomersRepository(db)
     sales = createSalesRepository(db, products, customers)

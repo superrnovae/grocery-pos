@@ -1,12 +1,19 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { AcceptableValue } from 'reka-ui'
 import { useSettingsStore } from '../stores/settings'
 import { ToggleGroup, ToggleGroupItem } from '../components/ui/toggle-group'
+import { Button } from '../components/ui/button'
+import { Alert, AlertDescription } from '../components/ui/alert'
 import type { Locale, Theme } from '@shared/types'
 
 const { t } = useI18n()
 const settings = useSettingsStore()
+
+const backupMessage = ref('')
+const backingUp = ref(false)
+const restoring = ref(false)
 
 function onThemeChange(value: AcceptableValue | AcceptableValue[]): void {
   if (typeof value === 'string' && value) settings.setTheme(value as Theme)
@@ -14,6 +21,33 @@ function onThemeChange(value: AcceptableValue | AcceptableValue[]): void {
 
 function onLocaleChange(value: AcceptableValue | AcceptableValue[]): void {
   if (typeof value === 'string' && value) settings.setLocale(value as Locale)
+}
+
+async function createBackup(): Promise<void> {
+  backingUp.value = true
+  backupMessage.value = ''
+  try {
+    const done = await window.api.backup.create()
+    if (done) backupMessage.value = t('settings.backup.created')
+  } catch (error) {
+    console.error('Backup failed', error)
+    backupMessage.value = t('settings.backup.createError')
+  } finally {
+    backingUp.value = false
+  }
+}
+
+async function restoreBackup(): Promise<void> {
+  if (!window.confirm(t('settings.backup.confirmRestore'))) return
+  restoring.value = true
+  backupMessage.value = ''
+  try {
+    await window.api.backup.restore()
+  } catch (error) {
+    console.error('Restore failed', error)
+    backupMessage.value = t('settings.backup.restoreError')
+    restoring.value = false
+  }
 }
 </script>
 
@@ -34,7 +68,7 @@ function onLocaleChange(value: AcceptableValue | AcceptableValue[]): void {
       </ToggleGroup>
     </div>
 
-    <div>
+    <div class="mb-6">
       <h2 class="text-muted-foreground mb-2 text-sm font-medium">{{ t('settings.language') }}</h2>
       <ToggleGroup
         type="single"
@@ -45,6 +79,23 @@ function onLocaleChange(value: AcceptableValue | AcceptableValue[]): void {
         <ToggleGroupItem value="fr">{{ t('language.fr') }}</ToggleGroupItem>
         <ToggleGroupItem value="en">{{ t('language.en') }}</ToggleGroupItem>
       </ToggleGroup>
+    </div>
+
+    <div>
+      <h2 class="text-muted-foreground mb-2 text-sm font-medium">
+        {{ t('settings.backup.title') }}
+      </h2>
+      <div class="flex gap-2">
+        <Button type="button" variant="outline" :disabled="backingUp" @click="createBackup">
+          {{ t('settings.backup.create') }}
+        </Button>
+        <Button type="button" variant="outline" :disabled="restoring" @click="restoreBackup">
+          {{ t('settings.backup.restore') }}
+        </Button>
+      </div>
+      <Alert v-if="backupMessage" class="mt-3">
+        <AlertDescription>{{ backupMessage }}</AlertDescription>
+      </Alert>
     </div>
   </section>
 </template>
