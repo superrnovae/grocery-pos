@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { Minus, Plus, Trash2 } from '@lucide/vue'
 import { useProductsStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
 import { useSalesStore } from '../stores/sales'
+import { useCustomersStore } from '../stores/customers'
 import { formatPrice } from '../utils/format'
 import type { Product } from '@shared/types'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
+import { Label } from '../components/ui/label'
 import { Alert, AlertDescription } from '../components/ui/alert'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '../components/ui/select'
 import {
   Table,
   TableBody,
@@ -20,16 +29,42 @@ import {
   TableRow
 } from '../components/ui/table'
 
+const NO_CUSTOMER = 'none'
+
 const { t, locale } = useI18n()
 const router = useRouter()
 const products = useProductsStore()
 const cart = useCartStore()
 const sales = useSalesStore()
+const customers = useCustomersStore()
 
 const search = ref('')
 const barcodeInput = ref('')
 const message = ref('')
 const completing = ref(false)
+const selectedCustomerId = ref(NO_CUSTOMER)
+const redeemPoints = ref(0)
+
+const selectedCustomer = computed(() =>
+  selectedCustomerId.value === NO_CUSTOMER
+    ? null
+    : (customers.items.find((customer) => customer.id === Number(selectedCustomerId.value)) ?? null)
+)
+
+const maxRedeemablePoints = computed(() => {
+  if (!selectedCustomer.value) return 0
+  const byPoints = selectedCustomer.value.points - (selectedCustomer.value.points % 100)
+  const byCart = Math.floor(cart.totalCents / 100) * 100
+  return Math.max(0, Math.min(byPoints, byCart))
+})
+
+watch(selectedCustomerId, () => {
+  redeemPoints.value = 0
+})
+
+function redeemMaxPoints(): void {
+  redeemPoints.value = maxRedeemablePoints.value
+}
 
 onMounted(async () => {
   if (!products.loaded) {
@@ -46,6 +81,14 @@ onMounted(async () => {
     message.value = t('checkout.cartItemsRemoved', { count: removed.length })
   } else if (updated.length > 0) {
     message.value = t('checkout.cartItemsUpdated', { count: updated.length })
+  }
+
+  if (!customers.loaded) {
+    try {
+      await customers.load()
+    } catch (error) {
+      console.error('Failed to load customers', error)
+    }
   }
 })
 
@@ -100,10 +143,16 @@ async function completeSale(): Promise<void> {
   if (cart.lines.length === 0 || completing.value) return
   completing.value = true
   try {
+    const hadCustomer = selectedCustomer.value !== null
     const sale = await sales.create({
-      items: cart.lines.map((line) => ({ productId: line.product.id, quantity: line.quantity }))
+      items: cart.lines.map((line) => ({ productId: line.product.id, quantity: line.quantity })),
+      customerId: selectedCustomer.value?.id ?? null,
+      redeemPoints: selectedCustomer.value ? redeemPoints.value : 0
     })
     cart.clear()
+    selectedCustomerId.value = NO_CUSTOMER
+    redeemPoints.value = 0
+    if (hadCustomer) await customers.load()
     router.push({ name: 'receipt', params: { id: String(sale.id) } })
   } catch (error) {
     console.error('Complete sale failed', error)
@@ -154,6 +203,50 @@ async function completeSale(): Promise<void> {
     <Alert v-if="message">
       <AlertDescription>{{ message }}</AlertDescription>
     </Alert>
+
+    <div class="flex flex-wrap items-end gap-3">
+      <div class="flex flex-col gap-1.5">
+        <Label for="checkout-customer">{{ t('checkout.customer.label') }}</Label>
+        <Select v-model="selectedCustomerId">
+          <SelectTrigger id="checkout-customer" class="w-56">
+            <SelectValue :placeholder="t('checkout.customer.none')" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem :value="NO_CUSTOMER">{{ t('checkout.customer.none') }}</SelectItem>
+            <SelectItem
+              v-for="customer in customers.items"
+              :key="customer.id"
+              :value="String(customer.id)"
+            >
+              {{ customer.name }} ({{ customer.points }} {{ t('checkout.customer.points') }})
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <template v-if="selectedCustomer">
+        <div class="flex flex-col gap-1.5">
+          <Label for="checkout-redeem">{{ t('checkout.customer.redeem') }}</Label>
+          <Input
+            id="checkout-redeem"
+            v-model.number="redeemPoints"
+            type="number"
+            step="100"
+            min="0"
+            :max="maxRedeemablePoints"
+            class="w-32"
+          />
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          :disabled="maxRedeemablePoints === 0"
+          @click="redeemMaxPoints"
+        >
+          {{ t('checkout.customer.redeemMax', { points: maxRedeemablePoints }) }}
+        </Button>
+      </template>
+    </div>
 
     <Table>
       <TableHeader>
@@ -215,8 +308,17 @@ async function completeSale(): Promise<void> {
     </Table>
 
     <footer class="flex items-center justify-end gap-5">
+      <div v-if="redeemPoints > 0" class="text-muted-foreground text-sm">
+        <div>{{ t('checkout.subtotal') }}: {{ formatPrice(cart.totalCents, locale) }}</div>
+        <div>
+          {{ t('checkout.customer.discount') }}: -{{
+            formatPrice(Math.min(redeemPoints, cart.totalCents), locale)
+          }}
+        </div>
+      </div>
       <span class="text-lg font-bold">
-        {{ t('checkout.total') }}: {{ formatPrice(cart.totalCents, locale) }}
+        {{ t('checkout.total') }}:
+        {{ formatPrice(Math.max(0, cart.totalCents - redeemPoints), locale) }}
       </span>
       <Button
         type="button"

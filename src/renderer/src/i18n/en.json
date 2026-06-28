@@ -3,6 +3,7 @@
     "checkout": "Checkout",
     "products": "Products",
     "history": "History",
+    "customers": "Customers",
     "settings": "Settings"
   },
   "common": {
@@ -85,8 +86,17 @@
     "cartItemsRemoved": "{count} item(s) were removed from the cart because they no longer exist in the catalog.",
     "cartItemsUpdated": "{count} item(s) in the cart had their price or name updated to match the catalog.",
     "emptyCart": "The cart is empty.",
+    "subtotal": "Subtotal",
     "total": "Total",
     "completeSale": "Complete sale",
+    "customer": {
+      "label": "Customer",
+      "none": "No customer",
+      "points": "pts",
+      "redeem": "Redeem points",
+      "redeemMax": "Redeem max ({points} pts)",
+      "discount": "Loyalty discount"
+    },
     "table": {
       "product": "Product",
       "unitPrice": "Unit price",
@@ -105,6 +115,7 @@
     "to": "To",
     "today": "Today",
     "clearFilter": "Clear",
+    "filteredByCustomer": "Showing sales for this customer only.",
     "empty": "No sales yet.",
     "notFound": "Sale not found.",
     "receiptTitle": "Receipt #{id}",
@@ -112,6 +123,27 @@
       "date": "Date",
       "items": "Items",
       "total": "Total"
+    }
+  },
+  "customers": {
+    "searchPlaceholder": "Search a customer...",
+    "addCustomer": "Add customer",
+    "viewSales": "View sales",
+    "empty": "No customers yet.",
+    "saveError": "Could not save the customer. Please try again.",
+    "form": {
+      "title": "New customer",
+      "name": "Name",
+      "phone": "Phone",
+      "errors": {
+        "nameRequired": "Name is required.",
+        "duplicatePhone": "Another customer already uses this phone number."
+      }
+    },
+    "table": {
+      "name": "Name",
+      "phone": "Phone",
+      "points": "Points"
     }
   },
   "settings": {

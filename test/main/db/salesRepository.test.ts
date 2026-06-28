@@ -5,17 +5,23 @@ import {
   createProductsRepository,
   type ProductsRepository
 } from '../../../src/main/db/productsRepository'
+import {
+  createCustomersRepository,
+  type CustomersRepository
+} from '../../../src/main/db/customersRepository'
 import { createSalesRepository, type SalesRepository } from '../../../src/main/db/salesRepository'
 
 describe('salesRepository', () => {
   let db: Database.Database
   let products: ProductsRepository
+  let customers: CustomersRepository
   let sales: SalesRepository
 
   beforeEach(() => {
     db = createDatabase(':memory:')
     products = createProductsRepository(db)
-    sales = createSalesRepository(db, products)
+    customers = createCustomersRepository(db)
+    sales = createSalesRepository(db, products, customers)
   })
 
   it('snapshots product name/price and computes totals at sale time', () => {
@@ -120,5 +126,108 @@ describe('salesRepository', () => {
 
     expect(sales.list({ fromDate: '0000-01-01', toDate: '9999-12-31' })).toHaveLength(1)
     expect(sales.list({ fromDate: '9999-01-01' })).toHaveLength(0)
+  })
+
+  it('filters sales by customer', () => {
+    const bread = products.create({
+      barcode: null,
+      name: 'Bread',
+      brand: null,
+      category: null,
+      priceCents: 200,
+      imageUrl: null,
+      source: 'manual'
+    })
+    const alice = customers.create({ name: 'Alice', phone: '111' })
+    sales.create({ items: [{ productId: bread.id, quantity: 1 }], customerId: alice.id })
+    sales.create({ items: [{ productId: bread.id, quantity: 1 }] })
+
+    expect(sales.list({ customerId: alice.id })).toHaveLength(1)
+    expect(sales.list()).toHaveLength(2)
+  })
+
+  it('awards 1 point per euro of the post-discount total to the chosen customer', () => {
+    const bread = products.create({
+      barcode: null,
+      name: 'Bread',
+      brand: null,
+      category: null,
+      priceCents: 1000,
+      imageUrl: null,
+      source: 'manual'
+    })
+    const alice = customers.create({ name: 'Alice', phone: '111' })
+
+    sales.create({ items: [{ productId: bread.id, quantity: 1 }], customerId: alice.id })
+
+    expect(customers.findById(alice.id)?.points).toBe(10)
+  })
+
+  it('redeems points in multiples of 100 for a clamped discount and deducts only what was applied', () => {
+    const bread = products.create({
+      barcode: null,
+      name: 'Bread',
+      brand: null,
+      category: null,
+      priceCents: 500,
+      imageUrl: null,
+      source: 'manual'
+    })
+    const alice = customers.create({ name: 'Alice', phone: '111' })
+    customers.addPoints(alice.id, 1000)
+
+    const sale = sales.create({
+      items: [{ productId: bread.id, quantity: 1 }],
+      customerId: alice.id,
+      redeemPoints: 1000
+    })
+
+    expect(sale.discountCents).toBe(500)
+    expect(sale.totalCents).toBe(0)
+    // 1000 starting points - 500 redeemed (clamped to the subtotal) + 0 earned on a free sale.
+    expect(customers.findById(alice.id)?.points).toBe(500)
+  })
+
+  it('rejects redeeming more points than the customer has', () => {
+    const bread = products.create({
+      barcode: null,
+      name: 'Bread',
+      brand: null,
+      category: null,
+      priceCents: 500,
+      imageUrl: null,
+      source: 'manual'
+    })
+    const alice = customers.create({ name: 'Alice', phone: '111' })
+
+    expect(() =>
+      sales.create({
+        items: [{ productId: bread.id, quantity: 1 }],
+        customerId: alice.id,
+        redeemPoints: 100
+      })
+    ).toThrow()
+  })
+
+  it('rejects redeeming a non-multiple-of-100 points amount', () => {
+    const bread = products.create({
+      barcode: null,
+      name: 'Bread',
+      brand: null,
+      category: null,
+      priceCents: 500,
+      imageUrl: null,
+      source: 'manual'
+    })
+    const alice = customers.create({ name: 'Alice', phone: '111' })
+    customers.addPoints(alice.id, 50)
+
+    expect(() =>
+      sales.create({
+        items: [{ productId: bread.id, quantity: 1 }],
+        customerId: alice.id,
+        redeemPoints: 50
+      })
+    ).toThrow()
   })
 })

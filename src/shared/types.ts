@@ -30,6 +30,8 @@ export interface Sale {
   id: number
   createdAt: string
   totalCents: number
+  discountCents: number
+  customerId: number | null
   items: SaleItem[]
 }
 
@@ -40,7 +42,20 @@ export interface CartLine {
 
 export interface NewSalePayload {
   items: { productId: number; quantity: number }[]
+  customerId?: number | null
+  redeemPoints?: number
 }
+
+export interface Customer {
+  id: number
+  name: string
+  phone: string | null
+  points: number
+  createdAt: string
+  updatedAt: string
+}
+
+export type NewCustomer = Pick<Customer, 'name' | 'phone'>
 
 export type Theme = 'light' | 'dark'
 export type Locale = 'fr' | 'en'

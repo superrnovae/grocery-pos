@@ -3,6 +3,7 @@
     "checkout": "Caisse",
     "products": "Produits",
     "history": "Historique",
+    "customers": "Clients",
     "settings": "Paramètres"
   },
   "common": {
@@ -85,8 +86,17 @@
     "cartItemsRemoved": "{count} article(s) ont été retirés du panier car ils n'existent plus dans le catalogue.",
     "cartItemsUpdated": "{count} article(s) du panier ont vu leur prix ou leur nom mis à jour selon le catalogue.",
     "emptyCart": "Le panier est vide.",
+    "subtotal": "Sous-total",
     "total": "Total",
     "completeSale": "Valider la vente",
+    "customer": {
+      "label": "Client",
+      "none": "Aucun client",
+      "points": "pts",
+      "redeem": "Points à utiliser",
+      "redeemMax": "Utiliser le maximum ({points} pts)",
+      "discount": "Remise fidélité"
+    },
     "table": {
       "product": "Produit",
       "unitPrice": "Prix unitaire",
@@ -105,6 +115,7 @@
     "to": "Au",
     "today": "Aujourd'hui",
     "clearFilter": "Effacer",
+    "filteredByCustomer": "Ventes de ce client uniquement.",
     "empty": "Aucune vente pour le moment.",
     "notFound": "Vente introuvable.",
     "receiptTitle": "Reçu #{id}",
@@ -112,6 +123,27 @@
       "date": "Date",
       "items": "Articles",
       "total": "Total"
+    }
+  },
+  "customers": {
+    "searchPlaceholder": "Rechercher un client...",
+    "addCustomer": "Ajouter un client",
+    "viewSales": "Voir les ventes",
+    "empty": "Aucun client pour le moment.",
+    "saveError": "Impossible d'enregistrer le client. Réessayez.",
+    "form": {
+      "title": "Nouveau client",
+      "name": "Nom",
+      "phone": "Téléphone",
+      "errors": {
+        "nameRequired": "Le nom est obligatoire.",
+        "duplicatePhone": "Un autre client utilise déjà ce numéro de téléphone."
+      }
+    },
+    "table": {
+      "name": "Nom",
+      "phone": "Téléphone",
+      "points": "Points"
     }
   },
   "settings": {

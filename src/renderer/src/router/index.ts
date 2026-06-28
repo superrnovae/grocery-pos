@@ -17,6 +17,11 @@ export const router = createRouter({
       component: () => import('../views/ReceiptView.vue'),
       props: true
     },
+    {
+      path: '/clients',
+      name: 'customers',
+      component: () => import('../views/CustomersView.vue')
+    },
     { path: '/parametres', name: 'settings', component: () => import('../views/SettingsView.vue') }
   ]
 })

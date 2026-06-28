@@ -1,12 +1,18 @@
 import type Database from 'better-sqlite3'
 import type { NewSalePayload, Sale, SaleItem } from '@shared/types'
 import type { ProductsRepository } from './productsRepository'
+import type { CustomersRepository } from './customersRepository'
 import type { SalesListFilter } from '@shared/ipc-contract'
+
+/** Points must be redeemed in multiples of 100 (100 points = €1 off, i.e. 1 point = 1 cent). */
+const POINTS_REDEMPTION_STEP = 100
 
 interface SaleRow {
   id: number
   created_at: string
   total_cents: number
+  discount_cents: number
+  customer_id: number | null
 }
 
 interface SaleItemRow {
@@ -39,9 +45,13 @@ export interface SalesRepository {
 
 export function createSalesRepository(
   db: Database.Database,
-  productsRepository: ProductsRepository
+  productsRepository: ProductsRepository,
+  customersRepository: CustomersRepository
 ): SalesRepository {
-  const insertSaleStmt = db.prepare('INSERT INTO sales (total_cents) VALUES (?)')
+  const insertSaleStmt = db.prepare(`
+    INSERT INTO sales (total_cents, discount_cents, customer_id)
+    VALUES (@totalCents, @discountCents, @customerId)
+  `)
   const insertItemStmt = db.prepare(`
     INSERT INTO sale_items
       (sale_id, product_id, product_name_snapshot, unit_price_cents_snapshot, quantity, line_total_cents)
@@ -49,14 +59,20 @@ export function createSalesRepository(
   `)
   const getSaleStmt = db.prepare('SELECT * FROM sales WHERE id = ?')
   const getItemsStmt = db.prepare('SELECT * FROM sale_items WHERE sale_id = ? ORDER BY id')
-  const listAllStmt = db.prepare('SELECT * FROM sales ORDER BY created_at DESC')
-  const listBetweenStmt = db.prepare(
-    'SELECT * FROM sales WHERE created_at >= @from AND created_at <= @to ORDER BY created_at DESC'
-  )
+
+  function rowToSale(row: SaleRow, items: SaleItem[]): Sale {
+    return {
+      id: row.id,
+      createdAt: row.created_at,
+      totalCents: row.total_cents,
+      discountCents: row.discount_cents,
+      customerId: row.customer_id,
+      items
+    }
+  }
 
   function hydrate(row: SaleRow): Sale {
-    const items = (getItemsStmt.all(row.id) as SaleItemRow[]).map(rowToSaleItem)
-    return { id: row.id, createdAt: row.created_at, totalCents: row.total_cents, items }
+    return rowToSale(row, (getItemsStmt.all(row.id) as SaleItemRow[]).map(rowToSaleItem))
   }
 
   function hydrateAll(rows: SaleRow[]): Sale[] {
@@ -74,12 +90,7 @@ export function createSalesRepository(
       itemsBySaleId.set(itemRow.sale_id, items)
     }
 
-    return rows.map((row) => ({
-      id: row.id,
-      createdAt: row.created_at,
-      totalCents: row.total_cents,
-      items: itemsBySaleId.get(row.id) ?? []
-    }))
+    return rows.map((row) => rowToSale(row, itemsBySaleId.get(row.id) ?? []))
   }
 
   const createTx = db.transaction((payload: NewSalePayload): number => {
@@ -100,8 +111,35 @@ export function createSalesRepository(
       }
     })
 
-    const totalCents = lines.reduce((sum, line) => sum + line.lineTotalCents, 0)
-    const saleId = Number(insertSaleStmt.run(totalCents).lastInsertRowid)
+    const subtotalCents = lines.reduce((sum, line) => sum + line.lineTotalCents, 0)
+
+    const customer =
+      payload.customerId != null ? customersRepository.findById(payload.customerId) : null
+    if (payload.customerId != null && !customer) {
+      throw new Error(`Customer ${payload.customerId} not found`)
+    }
+
+    const requestedPoints = payload.redeemPoints ?? 0
+    let pointsToDeduct = 0
+    let discountCents = 0
+    if (requestedPoints > 0) {
+      if (!customer) throw new Error('Cannot redeem points without a customer')
+      if (requestedPoints % POINTS_REDEMPTION_STEP !== 0) {
+        throw new Error(`Points must be redeemed in multiples of ${POINTS_REDEMPTION_STEP}`)
+      }
+      if (requestedPoints > customer.points) throw new Error('Not enough points to redeem')
+      discountCents = Math.min(requestedPoints, subtotalCents)
+      pointsToDeduct = discountCents
+    }
+
+    const totalCents = subtotalCents - discountCents
+    const saleId = Number(
+      insertSaleStmt.run({
+        totalCents,
+        discountCents,
+        customerId: customer?.id ?? null
+      }).lastInsertRowid
+    )
 
     for (const line of lines) {
       insertItemStmt.run({
@@ -114,6 +152,11 @@ export function createSalesRepository(
       })
     }
 
+    if (customer) {
+      const earnedPoints = Math.floor(totalCents / 100)
+      customersRepository.addPoints(customer.id, earnedPoints - pointsToDeduct)
+    }
+
     return saleId
   })
 
@@ -124,13 +167,24 @@ export function createSalesRepository(
     },
 
     list(filter: SalesListFilter = {}): Sale[] {
-      const rows =
-        filter.fromDate || filter.toDate
-          ? (listBetweenStmt.all({
-              from: filter.fromDate ?? '0000-01-01',
-              to: filter.toDate ?? '9999-12-31'
-            }) as SaleRow[])
-          : (listAllStmt.all() as SaleRow[])
+      const conditions: string[] = []
+      const params: Record<string, unknown> = {}
+      if (filter.fromDate) {
+        conditions.push('created_at >= @fromDate')
+        params.fromDate = filter.fromDate
+      }
+      if (filter.toDate) {
+        conditions.push('created_at <= @toDate')
+        params.toDate = filter.toDate
+      }
+      if (filter.customerId != null) {
+        conditions.push('customer_id = @customerId')
+        params.customerId = filter.customerId
+      }
+      const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+      const rows = db
+        .prepare(`SELECT * FROM sales ${where} ORDER BY created_at DESC`)
+        .all(params) as SaleRow[]
       return hydrateAll(rows)
     },
 

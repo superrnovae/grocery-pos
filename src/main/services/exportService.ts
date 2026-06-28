@@ -24,9 +24,10 @@ export function buildSalesCsv(sales: Sale[]): string {
     String(sale.id),
     sale.createdAt,
     sale.items.map((item) => `${item.productNameSnapshot} x${item.quantity}`).join('; '),
+    formatAmount(sale.discountCents),
     formatAmount(sale.totalCents)
   ])
-  return toCsv(['id', 'date', 'items', 'total'], rows)
+  return toCsv(['id', 'date', 'items', 'discount', 'total'], rows)
 }
 
 export function buildProductsCsv(products: Product[]): string {
@@ -52,14 +53,16 @@ const RECEIPT_LABELS = {
     product: 'Produit',
     qty: 'Qté',
     unitPrice: 'Prix unitaire',
-    total: 'Total'
+    total: 'Total',
+    discount: 'Remise fidélité'
   },
   en: {
     receipt: (id: number) => `Receipt #${id}`,
     product: 'Product',
     qty: 'Qty',
     unitPrice: 'Unit price',
-    total: 'Total'
+    total: 'Total',
+    discount: 'Loyalty discount'
   }
 } as const
 
@@ -99,6 +102,11 @@ function buildReceiptHtml(sale: Sale, locale: Locale): string {
       </thead>
       <tbody>${rows}</tbody>
       <tfoot>
+        ${
+          sale.discountCents > 0
+            ? `<tr><td colspan="3">${labels.discount}</td><td>-${formatAmount(sale.discountCents)}</td></tr>`
+            : ''
+        }
         <tr><td colspan="3">${labels.total}</td><td>${formatAmount(sale.totalCents)}</td></tr>
       </tfoot>
     </table>

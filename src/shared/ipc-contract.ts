@@ -1,7 +1,9 @@
 import type {
   AppSettings,
   BulkImportSummary,
+  Customer,
   ImportProgress,
+  NewCustomer,
   NewProduct,
   NewSalePayload,
   OpenFoodFactsLookupResult,
@@ -22,6 +24,9 @@ export const IpcChannel = {
   SalesCreate: 'sales:create',
   SalesList: 'sales:list',
   SalesGetById: 'sales:getById',
+  CustomersList: 'customers:list',
+  CustomersCreate: 'customers:create',
+  CustomersFindByPhone: 'customers:findByPhone',
   SettingsGet: 'settings:get',
   SettingsUpdate: 'settings:update',
   ExportSalesCsv: 'export:salesCsv',
@@ -35,6 +40,7 @@ export type IpcChannelName = (typeof IpcChannel)[keyof typeof IpcChannel]
 export interface SalesListFilter {
   fromDate?: string
   toDate?: string
+  customerId?: number
 }
 
 /** Shape exposed on `window.api` by the preload script; implemented 1:1 by main-process IPC handlers. */
@@ -55,6 +61,11 @@ export interface IpcApi {
     create(payload: NewSalePayload): Promise<Sale>
     list(filter: SalesListFilter): Promise<Sale[]>
     getById(id: number): Promise<Sale | null>
+  }
+  customers: {
+    list(): Promise<Customer[]>
+    create(input: NewCustomer): Promise<Customer>
+    findByPhone(phone: string): Promise<Customer | null>
   }
   settings: {
     get(): Promise<AppSettings>

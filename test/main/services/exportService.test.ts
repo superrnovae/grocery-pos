@@ -9,6 +9,8 @@ describe('exportService', () => {
         id: 1,
         createdAt: '2026-01-01T10:00:00.000Z',
         totalCents: 600,
+        discountCents: 0,
+        customerId: null,
         items: [
           {
             id: 1,
@@ -27,8 +29,8 @@ describe('exportService', () => {
     expect(csv.charCodeAt(0)).toBe(0xfeff)
     const lines = csv.slice(1).split('\r\n')
 
-    expect(lines[0]).toBe('id,date,items,total')
-    expect(lines[1]).toBe('1,2026-01-01T10:00:00.000Z,"Bread, white x3",6.00')
+    expect(lines[0]).toBe('id,date,items,discount,total')
+    expect(lines[1]).toBe('1,2026-01-01T10:00:00.000Z,"Bread, white x3",0.00,6.00')
   })
 
   it('builds a products CSV with empty strings for null fields', () => {

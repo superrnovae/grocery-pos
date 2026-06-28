@@ -37,9 +37,31 @@ const SCHEMA = `
     value TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS customers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT UNIQUE,
+    points INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+  );
+
   CREATE INDEX IF NOT EXISTS idx_sales_created_at ON sales(created_at);
   CREATE INDEX IF NOT EXISTS idx_sale_items_sale_id ON sale_items(sale_id);
 `
+
+/** Adds a column to an existing on-disk table if it isn't there yet (CREATE TABLE IF NOT EXISTS can't do this). */
+function ensureColumn(
+  db: Database.Database,
+  table: string,
+  column: string,
+  columnDdl: string
+): void {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]
+  if (!columns.some((existing) => existing.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${columnDdl}`)
+  }
+}
 
 /**
  * Opens (and migrates) the app database. Pass an explicit `filePath` (e.g. ':memory:')
@@ -51,5 +73,7 @@ export function createDatabase(filePath?: string): Database.Database {
   db.pragma('journal_mode = WAL')
   db.pragma('foreign_keys = ON')
   db.exec(SCHEMA)
+  ensureColumn(db, 'sales', 'customer_id', 'customer_id INTEGER')
+  ensureColumn(db, 'sales', 'discount_cents', 'discount_cents INTEGER NOT NULL DEFAULT 0')
   return db
 }

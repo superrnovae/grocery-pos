@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useSalesStore } from '../stores/sales'
 import { formatPrice } from '../utils/format'
 import type { SalesListFilter } from '@shared/ipc-contract'
@@ -19,23 +19,31 @@ import {
 } from '../components/ui/table'
 
 const { t, locale } = useI18n()
+const route = useRoute()
 const router = useRouter()
 const sales = useSalesStore()
 const exporting = ref(false)
 const statusMessage = ref('')
 const fromDate = ref('')
 const toDate = ref('')
+const customerId = ref(
+  typeof route.query.customerId === 'string' ? Number(route.query.customerId) : undefined
+)
 
-onMounted(async () => {
-  if (sales.loaded) return
-  await applyFilter()
-})
+applyFilter()
 
 function buildFilter(): SalesListFilter {
   const filter: SalesListFilter = {}
   if (fromDate.value) filter.fromDate = `${fromDate.value}T00:00:00.000Z`
   if (toDate.value) filter.toDate = `${toDate.value}T23:59:59.999Z`
+  if (customerId.value != null) filter.customerId = customerId.value
   return filter
+}
+
+function clearCustomerFilter(): void {
+  customerId.value = undefined
+  router.replace({ name: 'sales-history' })
+  applyFilter()
 }
 
 async function applyFilter(): Promise<void> {
@@ -110,6 +118,15 @@ async function exportCsv(): Promise<void> {
         t('history.clearFilter')
       }}</Button>
     </div>
+
+    <Alert v-if="customerId != null">
+      <AlertDescription class="flex items-center justify-between">
+        <span>{{ t('history.filteredByCustomer') }}</span>
+        <Button type="button" variant="ghost" size="sm" @click="clearCustomerFilter">
+          {{ t('history.clearFilter') }}
+        </Button>
+      </AlertDescription>
+    </Alert>
 
     <Alert v-if="statusMessage">
       <AlertDescription>{{ statusMessage }}</AlertDescription>

@@ -25,6 +25,11 @@ const api: IpcApi = {
     list: (filter) => ipcRenderer.invoke(IpcChannel.SalesList, filter),
     getById: (id) => ipcRenderer.invoke(IpcChannel.SalesGetById, id)
   },
+  customers: {
+    list: () => ipcRenderer.invoke(IpcChannel.CustomersList),
+    create: (input) => ipcRenderer.invoke(IpcChannel.CustomersCreate, input),
+    findByPhone: (phone) => ipcRenderer.invoke(IpcChannel.CustomersFindByPhone, phone)
+  },
   settings: {
     get: () => ipcRenderer.invoke(IpcChannel.SettingsGet),
     update: (patch) => ipcRenderer.invoke(IpcChannel.SettingsUpdate, patch)

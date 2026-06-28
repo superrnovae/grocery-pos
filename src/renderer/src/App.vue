@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { History, Package, Settings as SettingsIcon, ShoppingCart } from '@lucide/vue'
+import { History, Package, Settings as SettingsIcon, ShoppingCart, Users } from '@lucide/vue'
 import OnlineIndicator from './components/OnlineIndicator.vue'
 
 const { t } = useI18n()
@@ -9,6 +9,7 @@ const links = [
   { to: '/caisse', label: 'nav.checkout', icon: ShoppingCart },
   { to: '/produits', label: 'nav.products', icon: Package },
   { to: '/historique', label: 'nav.history', icon: History },
+  { to: '/clients', label: 'nav.customers', icon: Users },
   { to: '/parametres', label: 'nav.settings', icon: SettingsIcon }
 ]
 </script>

@@ -104,6 +104,10 @@ async function printSale(): Promise<void> {
         </TableRow>
       </TableBody>
       <TableFooter>
+        <TableRow v-if="sale.discountCents > 0">
+          <TableCell colspan="3">{{ t('checkout.customer.discount') }}</TableCell>
+          <TableCell>-{{ formatPrice(sale.discountCents, locale) }}</TableCell>
+        </TableRow>
         <TableRow>
           <TableCell colspan="3">{{ t('checkout.total') }}</TableCell>
           <TableCell>{{ formatPrice(sale.totalCents, locale) }}</TableCell>
