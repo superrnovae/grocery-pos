@@ -5,9 +5,12 @@ import type {
   DashboardStats,
   ImportProgress,
   NewCustomer,
+  NewOrderPayload,
   NewProduct,
   NewSalePayload,
   OpenFoodFactsLookupResult,
+  Order,
+  OrderStatus,
   Product,
   ProductUpdate,
   Sale
@@ -29,6 +32,10 @@ export const IpcChannel = {
   CustomersCreate: 'customers:create',
   CustomersFindByPhone: 'customers:findByPhone',
   AnalyticsGetDashboardStats: 'analytics:getDashboardStats',
+  OrdersCreate: 'orders:create',
+  OrdersList: 'orders:list',
+  OrdersGetById: 'orders:getById',
+  OrdersUpdateStatus: 'orders:updateStatus',
   SettingsGet: 'settings:get',
   SettingsUpdate: 'settings:update',
   ExportSalesCsv: 'export:salesCsv',
@@ -71,6 +78,12 @@ export interface IpcApi {
   }
   analytics: {
     getDashboardStats(): Promise<DashboardStats>
+  }
+  orders: {
+    create(payload: NewOrderPayload): Promise<Order>
+    list(): Promise<Order[]>
+    getById(id: number): Promise<Order | null>
+    updateStatus(id: number, status: OrderStatus): Promise<Order>
   }
   settings: {
     get(): Promise<AppSettings>

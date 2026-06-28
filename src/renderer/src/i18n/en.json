@@ -5,6 +5,7 @@
     "products": "Products",
     "history": "History",
     "customers": "Customers",
+    "orders": "Orders",
     "settings": "Settings"
   },
   "common": {
@@ -145,6 +146,29 @@
       "name": "Name",
       "phone": "Phone",
       "points": "Points"
+    }
+  },
+  "orders": {
+    "empty": "No orders yet.",
+    "createError": "Could not create the order. Please try again.",
+    "statusError": "Could not update the order status. Please try again.",
+    "form": {
+      "customerName": "Customer name",
+      "customerPhone": "Phone (optional)",
+      "addProduct": "Add a product",
+      "create": "Create order"
+    },
+    "status": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "delivered": "Delivered"
+    },
+    "table": {
+      "date": "Date",
+      "customer": "Customer",
+      "items": "Items",
+      "total": "Total",
+      "status": "Status"
     }
   },
   "dashboard": {

@@ -33,6 +33,12 @@ const api: IpcApi = {
   analytics: {
     getDashboardStats: () => ipcRenderer.invoke(IpcChannel.AnalyticsGetDashboardStats)
   },
+  orders: {
+    create: (payload) => ipcRenderer.invoke(IpcChannel.OrdersCreate, payload),
+    list: () => ipcRenderer.invoke(IpcChannel.OrdersList),
+    getById: (id) => ipcRenderer.invoke(IpcChannel.OrdersGetById, id),
+    updateStatus: (id, status) => ipcRenderer.invoke(IpcChannel.OrdersUpdateStatus, id, status)
+  },
   settings: {
     get: () => ipcRenderer.invoke(IpcChannel.SettingsGet),
     update: (patch) => ipcRenderer.invoke(IpcChannel.SettingsUpdate, patch)

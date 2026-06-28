@@ -4,6 +4,7 @@ import {
   History,
   LayoutDashboard,
   Package,
+  PackageSearch,
   Settings as SettingsIcon,
   ShoppingCart,
   Users
@@ -18,6 +19,7 @@ const links = [
   { to: '/produits', label: 'nav.products', icon: Package },
   { to: '/historique', label: 'nav.history', icon: History },
   { to: '/clients', label: 'nav.customers', icon: Users },
+  { to: '/commandes', label: 'nav.orders', icon: PackageSearch },
   { to: '/parametres', label: 'nav.settings', icon: SettingsIcon }
 ]
 </script>

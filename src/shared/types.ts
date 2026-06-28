@@ -68,6 +68,35 @@ export interface DashboardStats {
   topProducts: TopProduct[]
 }
 
+export type OrderStatus = 'pending' | 'in_progress' | 'delivered'
+
+export interface OrderItem {
+  id: number
+  orderId: number
+  productId: number | null
+  productNameSnapshot: string
+  unitPriceCentsSnapshot: number
+  quantity: number
+  lineTotalCents: number
+}
+
+export interface Order {
+  id: number
+  customerName: string
+  customerPhone: string | null
+  status: OrderStatus
+  totalCents: number
+  createdAt: string
+  updatedAt: string
+  items: OrderItem[]
+}
+
+export interface NewOrderPayload {
+  customerName: string
+  customerPhone?: string | null
+  items: { productId: number; quantity: number }[]
+}
+
 export type Theme = 'light' | 'dark'
 export type Locale = 'fr' | 'en'
 

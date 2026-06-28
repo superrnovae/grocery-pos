@@ -5,6 +5,7 @@
     "products": "Produits",
     "history": "Historique",
     "customers": "Clients",
+    "orders": "Commandes",
     "settings": "Paramètres"
   },
   "common": {
@@ -145,6 +146,29 @@
       "name": "Nom",
       "phone": "Téléphone",
       "points": "Points"
+    }
+  },
+  "orders": {
+    "empty": "Aucune commande pour le moment.",
+    "createError": "Impossible de créer la commande. Réessayez.",
+    "statusError": "Impossible de mettre à jour le statut de la commande. Réessayez.",
+    "form": {
+      "customerName": "Nom du client",
+      "customerPhone": "Téléphone (facultatif)",
+      "addProduct": "Ajouter un produit",
+      "create": "Créer la commande"
+    },
+    "status": {
+      "pending": "En attente",
+      "in_progress": "En cours",
+      "delivered": "Livrée"
+    },
+    "table": {
+      "date": "Date",
+      "customer": "Client",
+      "items": "Articles",
+      "total": "Total",
+      "status": "Statut"
     }
   },
   "dashboard": {

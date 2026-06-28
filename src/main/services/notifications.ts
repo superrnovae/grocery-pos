@@ -15,6 +15,16 @@ const MESSAGES = {
       title: 'Online lookup failed',
       body: `Looking up barcode ${barcode} failed (offline or network error). Manual entry required.`
     })
+  },
+  orderReady: {
+    fr: (customerName: string) => ({
+      title: 'Commande livrée',
+      body: `La commande de ${customerName} a été marquée comme livrée.`
+    }),
+    en: (customerName: string) => ({
+      title: 'Order delivered',
+      body: `${customerName}'s order was marked as delivered.`
+    })
   }
 } as const
 
@@ -34,5 +44,10 @@ export function notifySaleCompleted(totalCents: number, locale: Locale): void {
 
 export function notifyLookupFailed(barcode: string, locale: Locale): void {
   const { title, body } = MESSAGES.lookupFailed[locale](barcode)
+  show(title, body)
+}
+
+export function notifyOrderReady(customerName: string, locale: Locale): void {
+  const { title, body } = MESSAGES.orderReady[locale](customerName)
   show(title, body)
 }

@@ -46,8 +46,29 @@ const SCHEMA = `
     updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
   );
 
+  CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT,
+    status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'delivered')) DEFAULT 'pending',
+    total_cents INTEGER NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+    product_name_snapshot TEXT NOT NULL,
+    unit_price_cents_snapshot INTEGER NOT NULL,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    line_total_cents INTEGER NOT NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_sales_created_at ON sales(created_at);
   CREATE INDEX IF NOT EXISTS idx_sale_items_sale_id ON sale_items(sale_id);
+  CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 `
 
 /** Adds a column to an existing on-disk table if it isn't there yet (CREATE TABLE IF NOT EXISTS can't do this). */
