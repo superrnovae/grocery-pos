@@ -33,7 +33,8 @@ export default defineConfig(
             lang: 'ts'
           }
         }
-      ]
+      ],
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }]
     }
   },
   eslintConfigPrettier

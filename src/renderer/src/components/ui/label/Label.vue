@@ -6,7 +6,6 @@ import { cn } from '@renderer/lib/utils'
 const props = defineProps<LabelProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { class: _class, ...delegated } = props
   return delegated
 })
