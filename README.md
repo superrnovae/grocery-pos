@@ -1,38 +1,38 @@
 # Grocery POS
 
-A point-of-sale desktop application for a neighborhood grocery store, built with Electron, Vue 3, and TypeScript. Final project for the ic-etagsolutions.com Electron course.
+Une application de bureau de point de vente pour une épicerie de quartier, développée avec Electron, Vue 3 et TypeScript. Projet final pour le cours Electron de ic-etagsolutions.com.
 
-See [DESIGN.md](./DESIGN.md) for the data model, architecture, and the reasoning behind the technical choices.
+Voir [DESIGN.md](./DESIGN.md) pour le modèle de données, l'architecture, et la justification des choix techniques.
 
-## Features
+## Fonctionnalités
 
-- Product catalog: add/edit/delete products, search by name or barcode, bulk import from CSV
-- Barcode lookup against [OpenFoodFacts](https://world.openfoodfacts.org) for known products (cashier confirms the price), with a manual-entry fallback for unknown barcodes or when offline
-- Checkout: scan/search to build a cart, quantities, totals, sale completion, and an optional loyalty customer with points-based discounts
-- Sales history (filterable by date range and by customer) with per-sale receipts, printable or exported to PDF
-- Dashboard with today/yesterday revenue and top-selling products
-- Customer loyalty program: points earned and redeemed at checkout
-- Order delivery tracking: create an order, advance its status, get notified when it's delivered
-- Database backup & restore, and automatic update checks (`electron-updater`)
-- Multi-station sync over the local network (host/client) for products and sales
-- CSV export (sales, product catalog) and PDF export (receipts)
-- French/English UI and light/dark theme, both persisted
-- Fully offline for all core operations — only the barcode lookup, update checks, and sync need network access, and all three are designed to fail safely
-- System notifications on sale completion, failed lookups, order delivery, and available updates
-- Packaged as a Windows installer (NSIS)
+- Catalogue de produits : ajout/modification/suppression, recherche par nom ou code-barres, import en masse depuis un CSV
+- Recherche de code-barres auprès d'[OpenFoodFacts](https://world.openfoodfacts.org) pour les produits connus (la caissière confirme le prix), avec une saisie manuelle de repli pour les codes-barres inconnus ou en cas de déconnexion
+- Caisse : scan/recherche pour constituer un panier, quantités, totaux, validation de la vente, et un client fidélité optionnel avec remise en points
+- Historique des ventes (filtrable par période et par client) avec reçu par vente, imprimable ou exportable en PDF
+- Tableau de bord avec le chiffre d'affaires du jour et d'hier, et les produits les plus vendus
+- Programme de fidélité client : points gagnés et échangés en caisse
+- Suivi de livraison des commandes : création d'une commande, avancement de son statut, notification à la livraison
+- Sauvegarde et restauration de la base de données, et vérification automatique des mises à jour (`electron-updater`)
+- Synchronisation multi-poste sur le réseau local (hôte/client) pour les produits et les ventes
+- Export CSV (ventes, catalogue produits) et export PDF (reçus)
+- Interface français/anglais et thème clair/sombre, tous deux persistés
+- Entièrement utilisable hors ligne pour toutes les opérations essentielles — seules la recherche de code-barres, la vérification des mises à jour et la synchronisation nécessitent le réseau, et toutes trois sont conçues pour échouer sans danger
+- Notifications système à la validation d'une vente, en cas d'échec de recherche, à la livraison d'une commande, et lorsqu'une mise à jour est disponible
+- Packagée sous forme d'installeur Windows (NSIS)
 
-## Requirements
+## Prérequis
 
 - Node.js 22+
-- Windows (the installer target; `npm run dev` also runs on macOS/Linux during development)
+- Windows (cible de l'installeur ; `npm run dev` fonctionne aussi sous macOS/Linux en développement)
 
-## Install
+## Installation
 
 ```bash
 npm install
 ```
 
-## Development
+## Développement
 
 ```bash
 npm run dev
@@ -44,20 +44,20 @@ npm run dev
 npm test
 ```
 
-Runs the Vitest suite (repository logic against an in-memory SQLite database, cart math, CSV formatting, OpenFoodFacts response mapping). The `better-sqlite3` native module is built against Electron's Node ABI for normal use; `npm test` automatically rebuilds it against the system Node ABI first and restores the Electron build afterward.
+Lance la suite Vitest (logique des dépôts contre une base SQLite en mémoire, calculs du panier, formatage CSV, mapping des réponses OpenFoodFacts). Le module natif `better-sqlite3` est compilé pour l'ABI Node d'Electron en usage normal ; `npm test` le recompile automatiquement pour l'ABI du Node système, puis restaure le build Electron ensuite.
 
-## Build a Windows installer
+## Construire un installeur Windows
 
 ```bash
 npm run build:win
 ```
 
-Produces `release/grocery-pos-<version>-setup.exe` (NSIS installer) plus an unpacked build under `release/win-unpacked/`.
+Produit `release/grocery-pos-<version>-setup.exe` (installeur NSIS) ainsi qu'un build non packagé sous `release/win-unpacked/`.
 
-## Screenshots
+## Captures d'écran
 
-> TODO: replace with real screenshots after running the app (`npm run dev` or the installed build).
+> À FAIRE : remplacer par de vraies captures après avoir lancé l'application (`npm run dev` ou la version installée).
 
-- _Checkout view — cart and totals_
-- _Products view — OpenFoodFacts lookup workflow_
-- _Installed application running_
+- _Vue Caisse — panier et totaux_
+- _Vue Produits — parcours de recherche OpenFoodFacts_
+- _Application installée en cours d'exécution_
