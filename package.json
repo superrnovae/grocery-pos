@@ -4,6 +4,7 @@
   "description": "Point-of-sale desktop application for a neighborhood grocery store (Electron course final project)",
   "main": "./out/main/index.js",
   "author": "Grocery POS Team",
+  "repository": "github:superrnovae/grocery-pos",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
@@ -21,6 +22,8 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "prebuild:win": "npm run rebuild:electron",
     "build:win": "npm run build && electron-builder --win",
+    "prerelease:win": "npm run rebuild:electron",
+    "release:win": "npm run build && electron-builder --win --publish always",
     "pretest": "npm rebuild better-sqlite3",
     "test": "vitest run",
     "posttest": "npm run rebuild:electron"

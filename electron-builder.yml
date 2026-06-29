@@ -14,10 +14,11 @@ files:
 asarUnpack:
   - resources/**
 publish:
-  provider: generic
-  # Placeholder: point this at a real static file host (or swap providers, e.g. GitHub Releases)
-  # serving the artifacts in `release/` plus the generated latest.yml before shipping updates.
-  url: https://updates.example.com/grocery-pos
+  provider: github
+  # owner/repo are resolved from package.json's `repository` field. The release workflow
+  # (.github/workflows/release.yml) publishes here on every `vX.Y.Z` tag push, and
+  # electron-updater (src/main/services/updateService.ts) checks the same repo's
+  # Releases for updates at runtime.
 win:
   executableName: grocery-pos
   target: nsis
