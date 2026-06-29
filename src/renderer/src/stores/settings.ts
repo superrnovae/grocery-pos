@@ -10,6 +10,9 @@ export const useSettingsStore = defineStore('settings', {
   state: (): AppSettings & { loaded: boolean } => ({
     theme: 'light',
     locale: 'fr',
+    syncMode: 'off',
+    syncPort: 4178,
+    syncHost: '',
     loaded: false
   }),
   actions: {
@@ -17,6 +20,9 @@ export const useSettingsStore = defineStore('settings', {
       const settings = await window.api.settings.get()
       this.theme = settings.theme
       this.locale = settings.locale
+      this.syncMode = settings.syncMode
+      this.syncPort = settings.syncPort
+      this.syncHost = settings.syncHost
       applyTheme(this.theme)
       i18n.global.locale.value = this.locale
       this.loaded = true

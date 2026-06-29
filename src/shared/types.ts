@@ -99,10 +99,23 @@ export interface NewOrderPayload {
 
 export type Theme = 'light' | 'dark'
 export type Locale = 'fr' | 'en'
+export type SyncMode = 'off' | 'host' | 'client'
 
 export interface AppSettings {
   theme: Theme
   locale: Locale
+  syncMode: SyncMode
+  /** Port the host listens on (host mode) or connects to (client mode). */
+  syncPort: number
+  /** Host machine address to connect to, e.g. "192.168.1.20" (client mode only). */
+  syncHost: string
+}
+
+export interface SyncStatus {
+  mode: SyncMode
+  running: boolean
+  lastSyncedAt: string | null
+  lastError: string | null
 }
 
 export interface BulkImportSummary {

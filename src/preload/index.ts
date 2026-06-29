@@ -46,6 +46,12 @@ const api: IpcApi = {
   updates: {
     check: () => ipcRenderer.invoke(IpcChannel.UpdatesCheck)
   },
+  sync: {
+    start: (mode, options) => ipcRenderer.invoke(IpcChannel.SyncStart, mode, options),
+    stop: () => ipcRenderer.invoke(IpcChannel.SyncStop),
+    syncNow: () => ipcRenderer.invoke(IpcChannel.SyncNow),
+    getStatus: () => ipcRenderer.invoke(IpcChannel.SyncGetStatus)
+  },
   settings: {
     get: () => ipcRenderer.invoke(IpcChannel.SettingsGet),
     update: (patch) => ipcRenderer.invoke(IpcChannel.SettingsUpdate, patch)

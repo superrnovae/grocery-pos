@@ -193,6 +193,23 @@
       "title": "Updates",
       "check": "Check for updates",
       "checking": "Checking for updates... a notification will appear if one is found."
+    },
+    "sync": {
+      "title": "Multi-station sync",
+      "mode": "Mode",
+      "off": "Off",
+      "host": "Host",
+      "client": "Client",
+      "port": "Port",
+      "hostAddress": "Host address",
+      "hostPlaceholder": "e.g. 192.168.1.20",
+      "apply": "Apply",
+      "syncNow": "Sync now",
+      "never": "never",
+      "statusOff": "Sync is off.",
+      "statusHost": "Hosting on this machine's network address. Listening: {running}",
+      "statusClient": "Last synced: {lastSyncedAt}",
+      "error": "Could not apply sync settings. Check the host address and port."
     }
   }
 }

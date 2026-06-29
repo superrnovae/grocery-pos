@@ -45,8 +45,8 @@ export function createProductsRepository(db: Database.Database): ProductsReposit
   const findByIdStmt = db.prepare('SELECT * FROM products WHERE id = ?')
   const findByBarcodeStmt = db.prepare('SELECT * FROM products WHERE barcode = ?')
   const insertStmt = db.prepare(`
-    INSERT INTO products (barcode, name, brand, category, price_cents, image_url, source)
-    VALUES (@barcode, @name, @brand, @category, @priceCents, @imageUrl, @source)
+    INSERT INTO products (uuid, barcode, name, brand, category, price_cents, image_url, source)
+    VALUES (lower(hex(randomblob(16))), @barcode, @name, @brand, @category, @priceCents, @imageUrl, @source)
   `)
   const updateStmt = db.prepare(`
     UPDATE products
@@ -57,8 +57,8 @@ export function createProductsRepository(db: Database.Database): ProductsReposit
   `)
   const deleteStmt = db.prepare('DELETE FROM products WHERE id = ?')
   const upsertStmt = db.prepare(`
-    INSERT INTO products (barcode, name, brand, category, price_cents, image_url, source)
-    VALUES (@barcode, @name, @brand, @category, @priceCents, @imageUrl, @source)
+    INSERT INTO products (uuid, barcode, name, brand, category, price_cents, image_url, source)
+    VALUES (lower(hex(randomblob(16))), @barcode, @name, @brand, @category, @priceCents, @imageUrl, @source)
     ON CONFLICT(barcode) DO UPDATE SET
       name = excluded.name,
       brand = excluded.brand,

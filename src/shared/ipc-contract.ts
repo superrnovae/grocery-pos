@@ -13,7 +13,9 @@ import type {
   OrderStatus,
   Product,
   ProductUpdate,
-  Sale
+  Sale,
+  SyncMode,
+  SyncStatus
 } from './types'
 
 export const IpcChannel = {
@@ -39,6 +41,10 @@ export const IpcChannel = {
   BackupCreate: 'backup:create',
   BackupRestore: 'backup:restore',
   UpdatesCheck: 'updates:check',
+  SyncStart: 'sync:start',
+  SyncStop: 'sync:stop',
+  SyncNow: 'sync:now',
+  SyncGetStatus: 'sync:getStatus',
   SettingsGet: 'settings:get',
   SettingsUpdate: 'settings:update',
   ExportSalesCsv: 'export:salesCsv',
@@ -94,6 +100,12 @@ export interface IpcApi {
   }
   updates: {
     check(): Promise<void>
+  }
+  sync: {
+    start(mode: SyncMode, options: { port: number; host: string }): Promise<void>
+    stop(): Promise<void>
+    syncNow(): Promise<void>
+    getStatus(): Promise<SyncStatus>
   }
   settings: {
     get(): Promise<AppSettings>

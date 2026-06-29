@@ -101,5 +101,16 @@ export function createDatabase(filePath?: string): DatabaseHandle {
   db.exec(SCHEMA)
   ensureColumn(db, 'sales', 'customer_id', 'customer_id INTEGER')
   ensureColumn(db, 'sales', 'discount_cents', 'discount_cents INTEGER NOT NULL DEFAULT 0')
+
+  // Sync identity: a globally-unique id, since autoincrement `id`s collide across independent DBs.
+  // SQLite forbids a non-constant ALTER ... ADD COLUMN default once a table has rows, so the column
+  // is added bare and backfilled via UPDATE (which evaluates randomblob() fresh per row).
+  ensureColumn(db, 'products', 'uuid', 'uuid TEXT')
+  ensureColumn(db, 'sales', 'uuid', 'uuid TEXT')
+  db.exec('UPDATE products SET uuid = lower(hex(randomblob(16))) WHERE uuid IS NULL')
+  db.exec('UPDATE sales SET uuid = lower(hex(randomblob(16))) WHERE uuid IS NULL')
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_products_uuid ON products(uuid)')
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_sales_uuid ON sales(uuid)')
+
   return { db, filePath: dbPath }
 }

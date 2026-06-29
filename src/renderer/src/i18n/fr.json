@@ -193,6 +193,23 @@
       "title": "Mises à jour",
       "check": "Vérifier les mises à jour",
       "checking": "Vérification en cours... une notification apparaîtra si une mise à jour est trouvée."
+    },
+    "sync": {
+      "title": "Synchronisation multi-postes",
+      "mode": "Mode",
+      "off": "Désactivée",
+      "host": "Hôte",
+      "client": "Client",
+      "port": "Port",
+      "hostAddress": "Adresse de l'hôte",
+      "hostPlaceholder": "ex. 192.168.1.20",
+      "apply": "Appliquer",
+      "syncNow": "Synchroniser maintenant",
+      "never": "jamais",
+      "statusOff": "La synchronisation est désactivée.",
+      "statusHost": "Hébergement sur l'adresse réseau de ce poste. En écoute : {running}",
+      "statusClient": "Dernière synchronisation : {lastSyncedAt}",
+      "error": "Impossible d'appliquer les paramètres de synchronisation. Vérifiez l'adresse de l'hôte et le port."
     }
   }
 }

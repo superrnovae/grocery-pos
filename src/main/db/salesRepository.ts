@@ -49,8 +49,8 @@ export function createSalesRepository(
   customersRepository: CustomersRepository
 ): SalesRepository {
   const insertSaleStmt = db.prepare(`
-    INSERT INTO sales (total_cents, discount_cents, customer_id)
-    VALUES (@totalCents, @discountCents, @customerId)
+    INSERT INTO sales (uuid, total_cents, discount_cents, customer_id)
+    VALUES (lower(hex(randomblob(16))), @totalCents, @discountCents, @customerId)
   `)
   const insertItemStmt = db.prepare(`
     INSERT INTO sale_items

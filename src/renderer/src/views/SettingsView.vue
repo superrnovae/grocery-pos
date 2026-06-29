@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { AcceptableValue } from 'reka-ui'
 import { useSettingsStore } from '../stores/settings'
 import { ToggleGroup, ToggleGroupItem } from '../components/ui/toggle-group'
 import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
 import { Alert, AlertDescription } from '../components/ui/alert'
-import type { Locale, Theme } from '@shared/types'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '../components/ui/select'
+import type { Locale, SyncMode, SyncStatus, Theme } from '@shared/types'
 
 const { t } = useI18n()
 const settings = useSettingsStore()
@@ -16,6 +25,14 @@ const backingUp = ref(false)
 const restoring = ref(false)
 const updateMessage = ref('')
 const checkingForUpdates = ref(false)
+
+const syncMode = ref<SyncMode>(settings.syncMode)
+const syncPort = ref(settings.syncPort)
+const syncHost = ref(settings.syncHost)
+const syncStatus = ref<SyncStatus | null>(null)
+const syncMessage = ref('')
+const syncBusy = ref(false)
+let statusPoll: ReturnType<typeof setInterval> | null = null
 
 function onThemeChange(value: AcceptableValue | AcceptableValue[]): void {
   if (typeof value === 'string' && value) settings.setTheme(value as Theme)
@@ -63,10 +80,66 @@ async function checkForUpdates(): Promise<void> {
     checkingForUpdates.value = false
   }
 }
+
+async function refreshSyncStatus(): Promise<void> {
+  try {
+    syncStatus.value = await window.api.sync.getStatus()
+  } catch (error) {
+    console.error('Failed to get sync status', error)
+  }
+}
+
+onMounted(() => {
+  refreshSyncStatus()
+  statusPoll = setInterval(refreshSyncStatus, 5000)
+})
+
+onUnmounted(() => {
+  if (statusPoll) clearInterval(statusPoll)
+})
+
+function onSyncModeChange(value: AcceptableValue | AcceptableValue[]): void {
+  if (typeof value === 'string' && value) syncMode.value = value as SyncMode
+}
+
+async function applySyncSettings(): Promise<void> {
+  syncBusy.value = true
+  syncMessage.value = ''
+  try {
+    if (syncMode.value === 'off') {
+      await window.api.sync.stop()
+    } else {
+      await window.api.sync.start(syncMode.value, { port: syncPort.value, host: syncHost.value })
+    }
+    settings.syncMode = syncMode.value
+    settings.syncPort = syncPort.value
+    settings.syncHost = syncHost.value
+    await refreshSyncStatus()
+  } catch (error) {
+    console.error('Failed to apply sync settings', error)
+    syncMessage.value = t('settings.sync.error')
+  } finally {
+    syncBusy.value = false
+  }
+}
+
+async function syncNow(): Promise<void> {
+  syncBusy.value = true
+  syncMessage.value = ''
+  try {
+    await window.api.sync.syncNow()
+    await refreshSyncStatus()
+  } catch (error) {
+    console.error('Sync now failed', error)
+    syncMessage.value = t('settings.sync.error')
+  } finally {
+    syncBusy.value = false
+  }
+}
 </script>
 
 <template>
-  <section class="max-w-md">
+  <section class="max-w-2xl">
     <h1 class="mb-6 text-xl font-bold">{{ t('nav.settings') }}</h1>
 
     <div class="mb-6">
@@ -126,6 +199,73 @@ async function checkForUpdates(): Promise<void> {
       </Button>
       <Alert v-if="updateMessage" class="mt-3">
         <AlertDescription>{{ updateMessage }}</AlertDescription>
+      </Alert>
+    </div>
+
+    <div class="mt-6">
+      <h2 class="text-muted-foreground mb-2 text-sm font-medium">{{ t('settings.sync.title') }}</h2>
+      <div class="flex flex-wrap items-end gap-3">
+        <div class="flex flex-col gap-1.5">
+          <Label for="sync-mode">{{ t('settings.sync.mode') }}</Label>
+          <Select :model-value="syncMode" @update:model-value="onSyncModeChange">
+            <SelectTrigger id="sync-mode" class="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="off">{{ t('settings.sync.off') }}</SelectItem>
+              <SelectItem value="host">{{ t('settings.sync.host') }}</SelectItem>
+              <SelectItem value="client">{{ t('settings.sync.client') }}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div v-if="syncMode !== 'off'" class="flex flex-col gap-1.5">
+          <Label for="sync-port">{{ t('settings.sync.port') }}</Label>
+          <Input id="sync-port" v-model.number="syncPort" type="number" class="w-24" />
+        </div>
+        <div v-if="syncMode === 'client'" class="flex flex-col gap-1.5">
+          <Label for="sync-host">{{ t('settings.sync.hostAddress') }}</Label>
+          <Input
+            id="sync-host"
+            v-model="syncHost"
+            type="text"
+            :placeholder="t('settings.sync.hostPlaceholder')"
+            class="w-40"
+          />
+        </div>
+        <Button type="button" variant="outline" :disabled="syncBusy" @click="applySyncSettings">
+          {{ t('settings.sync.apply') }}
+        </Button>
+        <Button
+          v-if="syncStatus?.mode === 'client'"
+          type="button"
+          variant="outline"
+          :disabled="syncBusy"
+          @click="syncNow"
+        >
+          {{ t('settings.sync.syncNow') }}
+        </Button>
+      </div>
+
+      <p v-if="syncStatus" class="text-muted-foreground mt-3 text-sm">
+        <template v-if="syncStatus.mode === 'off'">{{ t('settings.sync.statusOff') }}</template>
+        <template v-else-if="syncStatus.mode === 'host'">
+          {{ t('settings.sync.statusHost', { running: syncStatus.running ? '✓' : '✗' }) }}
+        </template>
+        <template v-else>
+          {{
+            t('settings.sync.statusClient', {
+              lastSyncedAt: syncStatus.lastSyncedAt
+                ? new Date(syncStatus.lastSyncedAt).toLocaleTimeString()
+                : t('settings.sync.never')
+            })
+          }}
+          <span v-if="syncStatus.lastError" class="text-destructive">
+            — {{ syncStatus.lastError }}</span
+          >
+        </template>
+      </p>
+      <Alert v-if="syncMessage" variant="destructive" class="mt-3">
+        <AlertDescription>{{ syncMessage }}</AlertDescription>
       </Alert>
     </div>
   </section>

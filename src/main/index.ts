@@ -9,6 +9,7 @@ import { createSettingsRepository } from './db/settingsRepository'
 import { createCustomersRepository } from './db/customersRepository'
 import { createAnalyticsRepository } from './db/analyticsRepository'
 import { createOrdersRepository } from './db/ordersRepository'
+import { createSyncRepository } from './db/syncRepository'
 import { registerProductsHandlers } from './ipc/productsHandlers'
 import { registerSalesHandlers } from './ipc/salesHandlers'
 import { registerSettingsHandlers } from './ipc/settingsHandlers'
@@ -19,7 +20,9 @@ import { registerAnalyticsHandlers } from './ipc/analyticsHandlers'
 import { registerOrdersHandlers } from './ipc/ordersHandlers'
 import { registerBackupHandlers } from './ipc/backupHandlers'
 import { registerUpdatesHandlers } from './ipc/updatesHandlers'
+import { registerSyncHandlers } from './ipc/syncHandlers'
 import { checkForUpdates, initAutoUpdater } from './services/updateService'
+import { createSyncController } from './services/syncService'
 
 function createWindow(): void {
   // Create the browser window.
@@ -76,6 +79,8 @@ app.whenReady().then(() => {
   const settingsRepository = createSettingsRepository(db)
   const analyticsRepository = createAnalyticsRepository(db)
   const ordersRepository = createOrdersRepository(db, productsRepository)
+  const syncRepository = createSyncRepository(db)
+  const syncController = createSyncController(syncRepository)
 
   registerProductsHandlers(productsRepository)
   registerSalesHandlers(salesRepository, settingsRepository)
@@ -84,12 +89,21 @@ app.whenReady().then(() => {
   registerOrdersHandlers(ordersRepository, settingsRepository)
   registerBackupHandlers(db, dbFilePath)
   registerUpdatesHandlers()
+  registerSyncHandlers(syncController, settingsRepository)
   registerSettingsHandlers(settingsRepository)
   registerLookupHandlers(settingsRepository)
   registerExportHandlers(productsRepository, salesRepository, settingsRepository)
 
   initAutoUpdater(() => settingsRepository.get().locale)
   if (!is.dev) checkForUpdates()
+
+  const savedSettings = settingsRepository.get()
+  if (savedSettings.syncMode !== 'off') {
+    syncController.start(savedSettings.syncMode, {
+      port: savedSettings.syncPort,
+      host: savedSettings.syncHost
+    })
+  }
 
   createWindow()
 
@@ -100,6 +114,7 @@ app.whenReady().then(() => {
   })
 
   app.on('before-quit', () => {
+    syncController.stop()
     db.close()
   })
 })
