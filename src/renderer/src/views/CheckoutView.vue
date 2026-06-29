@@ -165,6 +165,8 @@ async function completeSale(): Promise<void> {
 
 <template>
   <section class="flex flex-col gap-4">
+    <h1 class="text-xl font-bold">{{ t('nav.checkout') }}</h1>
+
     <div class="flex flex-wrap gap-4">
       <form class="flex gap-2" @submit.prevent="addByBarcode">
         <Input

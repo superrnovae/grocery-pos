@@ -89,6 +89,8 @@ function viewSales(customerId: number): void {
 
 <template>
   <section class="flex flex-col gap-4">
+    <h1 class="text-xl font-bold">{{ t('nav.customers') }}</h1>
+
     <header class="flex flex-wrap items-center gap-3">
       <Input
         v-model="search"

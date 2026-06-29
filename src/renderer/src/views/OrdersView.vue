@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Trash2 } from '@lucide/vue'
+import { Minus, Plus, Trash2 } from '@lucide/vue'
 import { useProductsStore } from '../stores/products'
 import { useOrdersStore } from '../stores/orders'
 import { formatPrice } from '../utils/format'
@@ -194,7 +194,7 @@ function formatDate(iso: string): string {
                   class="size-7"
                   @click="changeQuantity(line.product.id, -1)"
                 >
-                  -
+                  <Minus class="size-3.5" />
                 </Button>
                 <span class="w-6 text-center">{{ line.quantity }}</span>
                 <Button
@@ -204,7 +204,7 @@ function formatDate(iso: string): string {
                   class="size-7"
                   @click="changeQuantity(line.product.id, 1)"
                 >
-                  +
+                  <Plus class="size-3.5" />
                 </Button>
               </div>
             </TableCell>

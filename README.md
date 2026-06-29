@@ -6,14 +6,19 @@ See [DESIGN.md](./DESIGN.md) for the data model, architecture, and the reasoning
 
 ## Features
 
-- Product catalog: add/edit/delete products, search by name or barcode
+- Product catalog: add/edit/delete products, search by name or barcode, bulk import from CSV
 - Barcode lookup against [OpenFoodFacts](https://world.openfoodfacts.org) for known products (cashier confirms the price), with a manual-entry fallback for unknown barcodes or when offline
-- Checkout: scan/search to build a cart, quantities, totals, and sale completion
-- Sales history with per-sale receipts
+- Checkout: scan/search to build a cart, quantities, totals, sale completion, and an optional loyalty customer with points-based discounts
+- Sales history (filterable by date range and by customer) with per-sale receipts, printable or exported to PDF
+- Dashboard with today/yesterday revenue and top-selling products
+- Customer loyalty program: points earned and redeemed at checkout
+- Order delivery tracking: create an order, advance its status, get notified when it's delivered
+- Database backup & restore, and automatic update checks (`electron-updater`)
+- Multi-station sync over the local network (host/client) for products and sales
 - CSV export (sales, product catalog) and PDF export (receipts)
 - French/English UI and light/dark theme, both persisted
-- Fully offline for all core operations — only the barcode lookup needs network access
-- System notifications on sale completion and failed lookups
+- Fully offline for all core operations — only the barcode lookup, update checks, and sync need network access, and all three are designed to fail safely
+- System notifications on sale completion, failed lookups, order delivery, and available updates
 - Packaged as a Windows installer (NSIS)
 
 ## Requirements
