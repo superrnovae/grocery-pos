@@ -56,8 +56,18 @@ Produit `release/grocery-pos-<version>-setup.exe` (installeur NSIS) ainsi qu'un 
 
 ## Captures d'écran
 
-> À FAIRE : remplacer par de vraies captures après avoir lancé l'application (`npm run dev` ou la version installée).
+### Vue Caisse — panier et totaux
 
-- _Vue Caisse — panier et totaux_
-- _Vue Produits — parcours de recherche OpenFoodFacts_
-- _Application installée en cours d'exécution_
+![Vue Caisse](./screenshots/caisse.png)
+
+### Vue Produits — parcours de recherche OpenFoodFacts
+
+![Vue Produits](./screenshots/produits.png)
+
+### Tableau de bord — chiffre d'affaires et produits les plus vendus
+
+![Tableau de bord](./screenshots/tableau-de-bord.png)
+
+### Application installée et lancée (preuve du packaging)
+
+![Application installée](./screenshots/application-installee.png)
