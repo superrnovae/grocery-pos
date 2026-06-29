@@ -19,6 +19,9 @@ publish:
   # (.github/workflows/release.yml) publishes here on every `vX.Y.Z` tag push, and
   # electron-updater (src/main/services/updateService.ts) checks the same repo's
   # Releases for updates at runtime.
+  # electron-builder's GitHub publisher defaults to creating a *draft* release, which
+  # electron-updater's "latest" check can't see — force a real, immediately-visible release.
+  releaseType: release
 win:
   executableName: grocery-pos
   target: nsis
